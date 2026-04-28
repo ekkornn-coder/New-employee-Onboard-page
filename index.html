@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>New Employee Onboarding</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&family=Prompt:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0D1B2A;
+    --teal: #1B6CA8;
+    --teal-light: #2196C4;
+    --gold: #F4B942;
+    --gold-light: #FFD166;
+    --white: #FFFFFF;
+    --off-white: #F5F7FA;
+    --gray: #8A9BB0;
+    --gray-light: #E8EDF3;
+    --success: #27AE60;
+    --danger: #E74C3C;
+    --card-shadow: 0 4px 20px rgba(13,27,42,0.12);
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Sarabun', sans-serif;
+    background: var(--off-white);
+    color: var(--navy);
+    min-height: 100vh;
+  }
+
+  /* ─── HEADER ─────────────────────────────────── */
+  .header {
+    background: linear-gradient(135deg, var(--navy) 0%, #1a3a5c 100%);
+    padding: 20px 16px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+  .header h1 {
+    font-family: 'Prompt', sans-serif;
+    font-size: 18px;
+    color: var(--white);
+    font-weight: 600;
+    line-height: 1.2;
+  }
+  .header-sub {
+    font-size: 12px;
+    color: var(--gold);
+    font-weight: 400;
+    display: block;
+    margin-top: 2px;
+  }
+  .admin-btn {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    padding: 8px 12px;
+    color: var(--white);
+    font-size: 12px;
+    cursor: pointer;
+    font-family: 'Sarabun', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s;
+  }
+  .admin-btn:hover { background: rgba(255,255,255,0.2); }
+  .admin-btn svg { width:14px; height:14px; }
+
+  /* Progress bar */
+  .progress-bar-wrap {
+    margin-top: 12px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 99px;
+    height: 6px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light));
+    border-radius: 99px;
+    transition: width 0.5s ease;
+  }
+  .progress-text {
+    display: flex;
+    justify-content: space-between;
+    color: rgba(255,255,255,0.7);
+    font-size: 11px;
+    margin-top: 5px;
+  }
+  .progress-text span { color: var(--gold); font-weight: 600; }
+
+  /* ─── MAIN CONTENT ───────────────────────────── */
+  .main { padding: 16px; padding-bottom: 80px; }
+
+  .welcome-card {
+    background: linear-gradient(135deg, var(--teal), var(--teal-light));
+    border-radius: var(--radius);
+    padding: 20px;
+    color: white;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .welcome-card::after {
+    content: '👋';
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 48px;
+    opacity: 0.3;
+  }
+  .welcome-card h2 {
+    font-family: 'Prompt', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .welcome-card p { font-size: 13px; opacity: 0.9; }
+
+  /* ─── CATEGORY ───────────────────────────────── */
+  .category-label {
+    font-family: 'Prompt', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 20px 0 10px 4px;
+  }
+
+  /* ─── TASK CARD ──────────────────────────────── */
+  .task-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    margin-bottom: 10px;
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+    transition: transform 0.15s, box-shadow 0.15s;
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+    border: 2px solid transparent;
+    position: relative;
+  }
+  .task-card:active { transform: scale(0.98); }
+  .task-card.completed { border-color: var(--success); }
+  .task-card.completed .task-inner { background: #f0faf4; }
+
+  .task-inner {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    gap: 14px;
+  }
+  .task-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .task-icon.navy { background: #E8EDF3; }
+  .task-icon.teal { background: #E3F2FD; }
+  .task-icon.gold { background: #FFF8E6; }
+  .task-icon.green { background: #E8F8F0; }
+
+  .task-info { flex: 1; min-width: 0; }
+  .task-title {
+    font-family: 'Prompt', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--navy);
+    line-height: 1.3;
+  }
+  .task-sub {
+    font-size: 12px;
+    color: var(--gray);
+    margin-top: 3px;
+  }
+  .task-badge {
+    display: inline-block;
+    background: var(--gold);
+    color: var(--navy);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 99px;
+    margin-top: 5px;
+  }
+  .task-badge.done { background: var(--success); color: white; }
+
+  .task-arrow {
+    color: var(--gray);
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .task-check {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--success);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  /* Click counter badge */
+  .click-count {
+    position: absolute;
+    top: 10px;
+    right: 36px;
+    background: var(--navy);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 99px;
+    opacity: 0.6;
+  }
+
+  /* ─── FLOATING FOOTER ────────────────────────── */
+  .footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--white);
+    padding: 12px 16px;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .footer-text {
+    font-size: 12px;
+    color: var(--gray);
+    line-height: 1.3;
+  }
+  .footer-text strong { color: var(--teal); }
+  .footer-done-btn {
+    background: linear-gradient(135deg, var(--teal), var(--teal-light));
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-family: 'Sarabun', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* ─── MODAL OVERLAY ──────────────────────────── */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 200;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .overlay.show { display: flex; }
+
+  .modal {
+    background: white;
+    border-radius: 24px 24px 0 0;
+    padding: 24px 20px 40px;
+    width: 100%;
+    max-width: 480px;
+    animation: slideUp 0.3s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  .modal-handle {
+    width: 40px; height: 4px;
+    background: #ddd;
+    border-radius: 99px;
+    margin: 0 auto 20px;
+  }
+  .modal h3 {
+    font-family: 'Prompt', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 6px;
+  }
+  .modal p { font-size: 13px; color: var(--gray); margin-bottom: 16px; }
+  .modal input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid var(--gray-light);
+    border-radius: 12px;
+    font-size: 16px;
+    font-family: 'Sarabun', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 12px;
+  }
+  .modal input:focus { border-color: var(--teal); }
+  .modal-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--navy), #1a3a5c);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Prompt', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .modal-cancel {
+    width: 100%;
+    padding: 14px;
+    background: transparent;
+    color: var(--gray);
+    border: none;
+    font-family: 'Sarabun', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+  .error-msg {
+    color: var(--danger);
+    font-size: 13px;
+    margin-top: -6px;
+    margin-bottom: 10px;
+    display: none;
+  }
+
+  /* ─── ADMIN PANEL ────────────────────────────── */
+  .admin-panel {
+    position: fixed;
+    inset: 0;
+    background: var(--off-white);
+    z-index: 300;
+    display: none;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  .admin-panel.show { display: flex; }
+  .admin-header {
+    background: linear-gradient(135deg, var(--navy), #1a3a5c);
+    padding: 20px 16px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .admin-header h2 {
+    font-family: 'Prompt', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    flex: 1;
+  }
+  .back-btn {
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-family: 'Sarabun', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .admin-body { padding: 16px; flex: 1; }
+
+  .admin-section {
+    background: white;
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: var(--card-shadow);
+  }
+  .admin-section h3 {
+    font-family: 'Prompt', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--gray-light);
+  }
+  .form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .form-row label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .form-row input, .form-row select {
+    padding: 12px 14px;
+    border: 2px solid var(--gray-light);
+    border-radius: 10px;
+    font-family: 'Sarabun', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    background: white;
+  }
+  .form-row input:focus, .form-row select:focus { border-color: var(--teal); }
+  .add-btn {
+    width: 100%;
+    padding: 13px;
+    background: linear-gradient(135deg, var(--teal), var(--teal-light));
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Prompt', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 4px;
+  }
+
+  /* Task list in admin */
+  .admin-task-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    border: 1px solid var(--gray-light);
+    border-radius: 10px;
+    margin-bottom: 8px;
+  }
+  .admin-task-info { flex: 1; }
+  .admin-task-title { font-size: 14px; font-weight: 600; color: var(--navy); }
+  .admin-task-meta { font-size: 11px; color: var(--gray); margin-top: 2px; }
+  .del-btn {
+    background: #FDECEA;
+    color: var(--danger);
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .stat-box {
+    flex: 1;
+    background: var(--off-white);
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+  }
+  .stat-num {
+    font-family: 'Prompt', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--teal);
+  }
+  .stat-lbl { font-size: 11px; color: var(--gray); margin-top: 2px; }
+
+  .toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--navy);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 99px;
+    font-size: 13px;
+    z-index: 999;
+    display: none;
+    white-space: nowrap;
+  }
+  .toast.show { display: block; animation: fadeInOut 2s forwards; }
+  @keyframes fadeInOut {
+    0%{opacity:0;transform:translateX(-50%) translateY(10px)}
+    15%{opacity:1;transform:translateX(-50%) translateY(0)}
+    75%{opacity:1}
+    100%{opacity:0}
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 20px;
+    color: var(--gray);
+    font-size: 13px;
+  }
+
+  .all-done-banner {
+    background: linear-gradient(135deg, var(--success), #2ECC71);
+    color: white;
+    border-radius: var(--radius);
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 16px;
+    display: none;
+  }
+  .all-done-banner h2 {
+    font-family: 'Prompt', sans-serif;
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+  .all-done-banner p { font-size: 13px; opacity: 0.9; }
+  .all-done-banner .done-icon { font-size: 40px; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+
+<!-- ─── HEADER ─── -->
+<div class="header">
+  <div class="header-top">
+    <div>
+      <h1>🏭 Onboarding<br><span class="header-sub">พนักงานใหม่ · New Employee</span></h1>
+    </div>
+    <button class="admin-btn" onclick="openAdminLogin()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      Admin
+    </button>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+  </div>
+  <div class="progress-text">
+    <span>ความคืบหน้า</span>
+    <span id="progressLabel">0 / 0 รายการ</span>
+  </div>
+</div>
+
+<!-- ─── MAIN ─── -->
+<div class="main">
+  <div class="welcome-card">
+    <h2>ยินดีต้อนรับ! 🎉</h2>
+    <p>กรุณาดำเนินการตามรายการด้านล่างให้ครบก่อนเริ่มงาน<br>Please complete all items below.</p>
+  </div>
+
+  <div class="all-done-banner" id="allDoneBanner">
+    <div class="done-icon">✅</div>
+    <h2>เสร็จสมบูรณ์!</h2>
+    <p>คุณดำเนินการครบทุกรายการแล้ว<br>All tasks completed!</p>
+  </div>
+
+  <div id="taskContainer"></div>
+</div>
+
+<!-- ─── FOOTER ─── -->
+<div class="footer">
+  <div class="footer-text">
+    ติ๊กถูกทุกรายการ<br>เพื่อยืนยันการรับทราบ<br><strong id="footerCount">0/0 เสร็จแล้ว</strong>
+  </div>
+  <button class="footer-done-btn" onclick="showSummary()">📋 ดูสรุป</button>
+</div>
+
+<!-- ─── ADMIN LOGIN MODAL ─── -->
+<div class="overlay" id="loginOverlay">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h3>🔐 เข้าสู่ระบบ Admin</h3>
+    <p>กรุณาใส่รหัสผ่านเพื่อจัดการรายการ</p>
+    <input type="password" id="pwInput" placeholder="รหัสผ่าน / Password" onkeydown="if(event.key==='Enter')checkPw()">
+    <div class="error-msg" id="pwError">❌ รหัสผ่านไม่ถูกต้อง</div>
+    <button class="modal-btn" onclick="checkPw()">เข้าสู่ระบบ</button>
+    <button class="modal-cancel" onclick="closeModal('loginOverlay')">ยกเลิก</button>
+  </div>
+</div>
+
+<!-- ─── SUMMARY MODAL ─── -->
+<div class="overlay" id="summaryOverlay">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h3>📋 สรุปการดำเนินการ</h3>
+    <p id="summaryText"></p>
+    <div id="summaryList"></div>
+    <button class="modal-btn" onclick="closeModal('summaryOverlay')">ตกลง</button>
+  </div>
+</div>
+
+<!-- ─── ADMIN PANEL ─── -->
+<div class="admin-panel" id="adminPanel">
+  <div class="admin-header">
+    <button class="back-btn" onclick="closeAdmin()">← กลับ</button>
+    <h2>⚙️ Admin Panel</h2>
+  </div>
+  <div class="admin-body">
+
+    <!-- Stats -->
+    <div class="admin-section">
+      <h3>📊 สถิติภาพรวม</h3>
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="stat-num" id="statTotal">0</div>
+          <div class="stat-lbl">รายการทั้งหมด</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="statClicks">0</div>
+          <div class="stat-lbl">คลิกทั้งหมด</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="statDone">0</div>
+          <div class="stat-lbl">เสร็จแล้ว</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add task -->
+    <div class="admin-section">
+      <h3>➕ เพิ่มรายการใหม่</h3>
+      <div class="form-row">
+        <label>หมวดหมู่ / Category</label>
+        <select id="newCat">
+          <option value="ยอมรับข้อตกลง">📋 ยอมรับข้อตกลง</option>
+          <option value="Update size เสื้อ">👕 Update size เสื้อ</option>
+          <option value="Update size รองเท้า">👟 Update size รองเท้า</option>
+          <option value="update สายi5">🏷️ update สายi5</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>ชื่อรายการ / Task Name</label>
+        <input type="text" id="newTitle" placeholder="เช่น ยอมรับข้อบังคับบริษัท">
+      </div>
+      <div class="form-row">
+        <label>คำอธิบาย / Description (optional)</label>
+        <input type="text" id="newSub" placeholder="รายละเอียดเพิ่มเติม">
+      </div>
+      <div class="form-row">
+        <label>ไอคอน / Icon (emoji)</label>
+        <input type="text" id="newIcon" placeholder="📋" maxlength="4" style="font-size:20px;">
+      </div>
+      <div class="form-row">
+        <label>ลิงก์ / Link URL</label>
+        <input type="url" id="newLink" placeholder="https://docs.google.com/forms/...">
+      </div>
+      <button class="add-btn" onclick="addTask()">+ เพิ่มรายการ</button>
+    </div>
+
+    <!-- Task list -->
+    <div class="admin-section">
+      <h3>📝 รายการทั้งหมด</h3>
+      <div id="adminTaskList"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ─── TOAST ─── -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── DATA ────────────────────────────────────────────────────────────────────
+const ADMIN_PW = '212224236';
+
+const CATEGORIES = [
+  { id: 'ยอมรับข้อตกลง', label: 'ยอมรับข้อตกลง', icon: '📋', colorClass: 'navy' },
+  { id: 'Update size เสื้อ', label: 'Update size เสื้อ', icon: '👕', colorClass: 'teal' },
+  { id: 'Update size รองเท้า', label: 'Update size รองเท้า', icon: '👟', colorClass: 'gold' },
+  { id: 'update สายi5', label: 'update สายi5', icon: '🏷️', colorClass: 'green' },
+];
+
+const DEFAULT_TASKS = [
+  { id: 't1', cat: 'ยอมรับข้อตกลง', title: 'ยอมรับข้อบังคับบริษัท', sub: 'Company Regulations', icon: '📄', link: '#' },
+  { id: 't2', cat: 'ยอมรับข้อตกลง', title: 'นโยบายความปลอดภัย', sub: 'Safety Policy', icon: '⛑️', link: '#' },
+  { id: 't3', cat: 'ยอมรับข้อตกลง', title: 'จรรยาบรรณพนักงาน', sub: 'Employee Code of Conduct', icon: '🤝', link: '#' },
+  { id: 't4', cat: 'Update size เสื้อ', title: 'กรอกไซส์เสื้อ', sub: 'Fill in shirt size (S/M/L/XL/XXL)', icon: '👕', link: '#' },
+  { id: 't5', cat: 'Update size รองเท้า', title: 'กรอกไซส์รองเท้า', sub: 'Fill in shoe size', icon: '👟', link: '#' },
+  { id: 't6', cat: 'update สายi5', title: 'อัปเดตสาย i5', sub: 'i5 Line Assignment Update', icon: '🏷️', link: '#' },
+];
+
+function loadTasks() {
+  try {
+    const saved = localStorage.getItem('ob_tasks');
+    return saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DEFAULT_TASKS));
+  } catch { return JSON.parse(JSON.stringify(DEFAULT_TASKS)); }
+}
+
+function saveTasks(tasks) {
+  localStorage.setItem('ob_tasks', JSON.stringify(tasks));
+}
+
+function loadClicks() {
+  try { return JSON.parse(localStorage.getItem('ob_clicks') || '{}'); }
+  catch { return {}; }
+}
+
+function saveClicks(clicks) {
+  localStorage.setItem('ob_clicks', JSON.stringify(clicks));
+}
+
+function loadCompleted() {
+  try { return JSON.parse(localStorage.getItem('ob_completed') || '[]'); }
+  catch { return []; }
+}
+
+function saveCompleted(arr) {
+  localStorage.setItem('ob_completed', JSON.stringify(arr));
+}
+
+let tasks = loadTasks();
+let clicks = loadClicks();
+let completed = loadCompleted();
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
+function render() {
+  const container = document.getElementById('taskContainer');
+  container.innerHTML = '';
+
+  CATEGORIES.forEach(cat => {
+    const catTasks = tasks.filter(t => t.cat === cat.id);
+    if (!catTasks.length) return;
+
+    const label = document.createElement('div');
+    label.className = 'category-label';
+    label.textContent = cat.icon + '  ' + cat.label;
+    container.appendChild(label);
+
+    catTasks.forEach(task => {
+      const isDone = completed.includes(task.id);
+      const clickCount = clicks[task.id] || 0;
+      const catInfo = CATEGORIES.find(c => c.id === task.cat);
+
+      const card = document.createElement('a');
+      card.className = 'task-card' + (isDone ? ' completed' : '');
+      card.href = task.link || '#';
+      card.target = '_blank';
+      card.rel = 'noopener noreferrer';
+      card.onclick = (e) => handleTaskClick(e, task.id, task.link);
+
+      card.innerHTML = `
+        ${clickCount > 0 ? `<div class="click-count">👆 ${clickCount}</div>` : ''}
+        <div class="task-inner">
+          <div class="task-icon ${catInfo ? catInfo.colorClass : 'navy'}">${task.icon || '📋'}</div>
+          <div class="task-info">
+            <div class="task-title">${task.title}</div>
+            ${task.sub ? `<div class="task-sub">${task.sub}</div>` : ''}
+            <div class="task-badge ${isDone ? 'done' : ''}">${isDone ? '✓ เสร็จแล้ว' : 'กดเพื่อดำเนินการ'}</div>
+          </div>
+          ${isDone
+            ? `<div class="task-check">✓</div>`
+            : `<div class="task-arrow">›</div>`
+          }
+        </div>`;
+
+      container.appendChild(card);
+    });
+  });
+
+  updateProgress();
+  updateFooter();
+  updateAllDoneBanner();
+}
+
+function handleTaskClick(e, taskId, link) {
+  // Track click
+  clicks[taskId] = (clicks[taskId] || 0) + 1;
+  saveClicks(clicks);
+
+  // Mark complete after click (user visited link)
+  if (!completed.includes(taskId)) {
+    completed.push(taskId);
+    saveCompleted(completed);
+  }
+
+  // If no real link, prevent navigation
+  if (!link || link === '#') {
+    e.preventDefault();
+    showToast('✅ บันทึกแล้ว!');
+  }
+
+  setTimeout(() => render(), 300);
+}
+
+function updateProgress() {
+  const total = tasks.length;
+  const done = completed.filter(id => tasks.find(t => t.id === id)).length;
+  const pct = total ? Math.round((done / total) * 100) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = `${done} / ${total} รายการ`;
+}
+
+function updateFooter() {
+  const total = tasks.length;
+  const done = completed.filter(id => tasks.find(t => t.id === id)).length;
+  document.getElementById('footerCount').textContent = `${done}/${total} เสร็จแล้ว`;
+}
+
+function updateAllDoneBanner() {
+  const total = tasks.length;
+  const done = completed.filter(id => tasks.find(t => t.id === id)).length;
+  document.getElementById('allDoneBanner').style.display = (total && done === total) ? 'block' : 'none';
+}
+
+// ─── ADMIN ────────────────────────────────────────────────────────────────────
+function openAdminLogin() {
+  document.getElementById('pwInput').value = '';
+  document.getElementById('pwError').style.display = 'none';
+  document.getElementById('loginOverlay').classList.add('show');
+  setTimeout(() => document.getElementById('pwInput').focus(), 300);
+}
+
+function checkPw() {
+  const val = document.getElementById('pwInput').value.trim();
+  if (val === ADMIN_PW) {
+    closeModal('loginOverlay');
+    openAdmin();
+  } else {
+    document.getElementById('pwError').style.display = 'block';
+    document.getElementById('pwInput').value = '';
+    document.getElementById('pwInput').focus();
+  }
+}
+
+function openAdmin() {
+  renderAdminPanel();
+  document.getElementById('adminPanel').classList.add('show');
+}
+
+function closeAdmin() {
+  document.getElementById('adminPanel').classList.remove('show');
+  render();
+}
+
+function renderAdminPanel() {
+  // Stats
+  const totalClicks = Object.values(clicks).reduce((s, v) => s + v, 0);
+  const done = completed.filter(id => tasks.find(t => t.id === id)).length;
+  document.getElementById('statTotal').textContent = tasks.length;
+  document.getElementById('statClicks').textContent = totalClicks;
+  document.getElementById('statDone').textContent = done;
+
+  // Task list
+  const list = document.getElementById('adminTaskList');
+  list.innerHTML = '';
+  if (!tasks.length) {
+    list.innerHTML = '<div class="empty-state">ยังไม่มีรายการ</div>';
+    return;
+  }
+
+  tasks.forEach(task => {
+    const clickCount = clicks[task.id] || 0;
+    const isDone = completed.includes(task.id);
+    const div = document.createElement('div');
+    div.className = 'admin-task-item';
+    div.innerHTML = `
+      <div style="font-size:22px">${task.icon || '📋'}</div>
+      <div class="admin-task-info">
+        <div class="admin-task-title">${task.title}</div>
+        <div class="admin-task-meta">
+          ${task.cat} · 👆${clickCount} คลิก · ${isDone ? '✅ เสร็จ' : '⏳ ยังไม่เสร็จ'}
+        </div>
+      </div>
+      <button class="del-btn" onclick="deleteTask('${task.id}')">ลบ</button>
+    `;
+    list.appendChild(div);
+  });
+}
+
+function addTask() {
+  const cat = document.getElementById('newCat').value;
+  const title = document.getElementById('newTitle').value.trim();
+  const sub = document.getElementById('newSub').value.trim();
+  const icon = document.getElementById('newIcon').value.trim() || '📋';
+  const link = document.getElementById('newLink').value.trim() || '#';
+
+  if (!title) { showToast('⚠️ กรุณาใส่ชื่อรายการ'); return; }
+
+  const newTask = {
+    id: 't' + Date.now(),
+    cat, title, sub, icon, link
+  };
+  tasks.push(newTask);
+  saveTasks(tasks);
+
+  document.getElementById('newTitle').value = '';
+  document.getElementById('newSub').value = '';
+  document.getElementById('newIcon').value = '';
+  document.getElementById('newLink').value = '';
+
+  renderAdminPanel();
+  showToast('✅ เพิ่มรายการแล้ว!');
+}
+
+function deleteTask(id) {
+  if (!confirm('ยืนยันการลบรายการนี้?')) return;
+  tasks = tasks.filter(t => t.id !== id);
+  saveTasks(tasks);
+  completed = completed.filter(c => c !== id);
+  saveCompleted(completed);
+  delete clicks[id];
+  saveClicks(clicks);
+  renderAdminPanel();
+  showToast('🗑️ ลบรายการแล้ว');
+}
+
+// ─── SUMMARY ─────────────────────────────────────────────────────────────────
+function showSummary() {
+  const total = tasks.length;
+  const done = completed.filter(id => tasks.find(t => t.id === id)).length;
+  const pending = total - done;
+
+  document.getElementById('summaryText').textContent =
+    `เสร็จแล้ว ${done} รายการ / ยังไม่เสร็จ ${pending} รายการ`;
+
+  const listEl = document.getElementById('summaryList');
+  listEl.innerHTML = '';
+  tasks.forEach(task => {
+    const isDone = completed.includes(task.id);
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #eee;font-size:13px;';
+    row.innerHTML = `
+      <span style="font-size:18px">${isDone ? '✅' : '⏳'}</span>
+      <span style="flex:1;color:${isDone ? '#27AE60' : '#8A9BB0'}">${task.title}</span>
+    `;
+    listEl.appendChild(row);
+  });
+
+  document.getElementById('summaryOverlay').classList.add('show');
+}
+
+// ─── UTILS ────────────────────────────────────────────────────────────────────
+function closeModal(id) {
+  document.getElementById(id).classList.remove('show');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.remove('show');
+  void t.offsetWidth;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2100);
+}
+
+// Close overlay on backdrop click
+document.querySelectorAll('.overlay').forEach(el => {
+  el.addEventListener('click', e => {
+    if (e.target === el) el.classList.remove('show');
+  });
+});
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
