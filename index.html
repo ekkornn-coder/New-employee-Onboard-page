@@ -696,12 +696,6 @@
 </div>
 
 <!-- ─── MAIN ─── -->
-<div id="loadingBanner" style="display:none;position:fixed;inset:0;background:rgba(13,27,42,0.85);z-index:999;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:white;font-family:'Prompt',sans-serif;">
-  <div style="font-size:36px">⏳</div>
-  <div style="font-size:16px;font-weight:600">กำลังโหลดข้อมูล...</div>
-  <div style="font-size:12px;opacity:0.7">Loading from cloud</div>
-</div>
-
 <div class="main">
   <div class="welcome-card">
     <h2>ยินดีต้อนรับ! 🎉</h2>
@@ -759,20 +753,7 @@
     <h2>⚙️ Admin Panel</h2>
   </div>
   <div class="admin-body">
-    <!-- Cloud status -->
-    <div id="cloudStatus" style="background:white;border-radius:12px;padding:14px 16px;margin-bottom:12px;font-size:13px;box-shadow:0 2px 8px rgba(0,0,0,0.08);line-height:1.6;"></div>
 
-    <!-- Setup guide (hidden by default) -->
-    <div id="setupGuide" style="display:none;background:#FFF8E6;border:2px solid var(--gold);border-radius:12px;padding:16px;margin-bottom:12px;font-size:13px;line-height:1.7;">
-      <div style="font-family:'Prompt',sans-serif;font-weight:700;font-size:15px;margin-bottom:8px">📖 วิธี Setup JSONBin (ฟรี)</div>
-      1. ไปที่ <a href="https://jsonbin.io" target="_blank" style="color:var(--teal)"><strong>jsonbin.io</strong></a> → Sign Up ฟรี<br>
-      2. กด <strong>+ Create Bin</strong> → ใส่ <code>{}</code> → Create<br>
-      3. Copy <strong>Bin ID</strong> (ตัวเลขยาวๆ ใน URL)<br>
-      4. ไปที่ API Keys → Copy <strong>Master Key</strong><br>
-      5. เปิดไฟล์ onboard.html → หาบรรทัด:<br>
-      <code style="background:#eee;padding:4px 8px;border-radius:4px;display:block;margin:6px 0">const JSONBIN_BIN_ID  = '';<br>const JSONBIN_API_KEY = '';</code>
-      6. วาง Bin ID และ API Key ลงไป → บันทึกไฟล์ → Push ขึ้น GitHub อีกครั้ง ✅
-    </div>
 
     <!-- Categories -->
     <div class="admin-section">
@@ -863,56 +844,40 @@
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
 const ADMIN_PW = '212224236';
 
-// JSONBin.io — FREE cloud storage so admin changes reach ALL users
-// SETUP: Go to https://jsonbin.io → Sign up free → Create a Bin with {} → Copy the Bin ID & API Key below
-// The bin will store: { categories: [...], tasks: [...], version: "..." }
-const JSONBIN_BIN_ID  = '69f2e1e9856a6821898c5f6a';
-const JSONBIN_API_KEY = '$2a$10$aHNhApvTYWKfVCihDNM1Pu6ahaTxuob3Q83YES1DN7rU8B9S8bvNC';
-
-// If JSONBin is not configured, falls back to localStorage (single-device only)
-const USE_CLOUD = JSONBIN_BIN_ID !== '' && JSONBIN_API_KEY !== '';
+// Data stored in localStorage + synced across tabs via BroadcastChannel
+const USE_CLOUD = false;
 
 // ─── DEFAULT DATA ─────────────────────────────────────────────────────────────
 const DEFAULT_CATEGORIES = [
-  { id: 'ยอมรับข้อตกลง',    label: 'ยอมรับข้อตกลง',    icon: '📋', colorClass: 'navy',  order: 0 },
-  { id: 'Update size เสื้อ', label: 'Update size เสื้อ', icon: '👕', colorClass: 'teal',  order: 1 },
-  { id: 'Update size รองเท้า', label: 'Update size รองเท้า', icon: '👟', colorClass: 'gold', order: 2 },
-  { id: 'update สายรถ',      label: 'update สายรถ',      icon: '🚌', colorClass: 'green', order: 3 },
+  { id: 'สั่งข้าว',              label: 'สั่งข้าว',              icon: '🍱', colorClass: 'gold',  order: 0 },
+  { id: 'ลงทะเบียนพนักงาน',      label: 'ลงทะเบียนพนักงาน',      icon: '📝', colorClass: 'navy',  order: 1 },
+  { id: 'อื่นๆ',                 label: 'อื่นๆ',                 icon: '📦', colorClass: 'teal',  order: 2 },
 ];
 const DEFAULT_TASKS = [
-  { id: 't1', cat: 'ยอมรับข้อตกลง',    title: 'ยอมรับข้อบังคับบริษัท',  sub: 'Company Regulations',      icon: '📄', link: '#' },
-  { id: 't2', cat: 'ยอมรับข้อตกลง',    title: 'นโยบายความปลอดภัย',       sub: 'Safety Policy',            icon: '⛑️', link: '#' },
-  { id: 't3', cat: 'ยอมรับข้อตกลง',    title: 'จรรยาบรรณพนักงาน',        sub: 'Employee Code of Conduct', icon: '🤝', link: '#' },
-  { id: 't4', cat: 'Update size เสื้อ', title: 'กรอกไซส์เสื้อ',           sub: 'Fill in shirt size (S/M/L/XL/XXL)', icon: '👕', link: '#' },
-  { id: 't5', cat: 'Update size รองเท้า', title: 'กรอกไซส์รองเท้า',       sub: 'Fill in shoe size',        icon: '👟', link: '#' },
-  { id: 't6', cat: 'update สายรถ',      title: 'อัปเดตสายรถ',             sub: 'Bus Route Assignment Update', icon: '🚌', link: '#' },
+  { id: 't1', cat: 'สั่งข้าว',         title: 'สั่งข้าว', sub: 'กดเพื่อสั่งอาหาร', icon: '🍱', link: 'https://docs.google.com/forms/d/e/1FAIpQLSfYBJCmNFar0rgnIlIXm4PHsJelaSmeAbIJNlAKbPlf9i5RAA/viewform' },
+  { id: 't2', cat: 'ลงทะเบียนพนักงาน', title: 'แบบฟอร์มรับทราบเอกสารทรัพย์สินทางปัญญา, BCG และ AUP', sub: 'ฉบับภาษาไทย', icon: '📜', link: 'https://docs.google.com/forms/d/e/1FAIpQLSeTeGqe-3WYpUzqC6XA4yr6dOkWnIr1-P8q-7ByuW5OppjoSQ/viewform' },
+  { id: 't3', cat: 'ลงทะเบียนพนักงาน', title: 'ลงทะเบียนข้อมูลพนักงานสำหรับ Payroll', sub: 'กรอกข้อมูลเงินเดือน', icon: '💰', link: 'https://docs.google.com/forms/d/15ywNo8tdH4Mapen1kCx-q9JuTxJfWZxSNNRYvXbX_0E/viewform?edit_requested=true' },
+  { id: 't4', cat: 'ลงทะเบียนพนักงาน', title: 'ขอความยินยอมข้อมูลชีวมิติ (Biometric)', sub: 'Biometric Data Consent', icon: '🫆', link: 'https://docs.google.com/forms/d/1CKRznKS-9DPrg6kdoydLdQcgQOWWICEeQztxGXAuV3o/viewform?edit_requested=true' },
+  { id: 't5', cat: 'อื่นๆ',             title: 'ลงทะเบียนรองเท้า & เสื้อ', sub: 'แจ้งไซส์ชุดพนักงาน', icon: '👟', link: 'https://docs.google.com/forms/d/e/1FAIpQLSdMdTziUm7BLCn2RFit9Hh0pqfxvFAP_4Se1CS41VQ_65NnXw/viewform' },
 ];
 const COLOR_CLASSES = ['navy','teal','gold','green'];
 
-// ─── CLOUD STORAGE (JSONBin) ──────────────────────────────────────────────────
-let cloudData = null; // { categories, tasks, version }
-
-async function fetchCloud() {
-  if (!USE_CLOUD) return null;
-  try {
-    const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
-      headers: { 'X-Master-Key': JSONBIN_API_KEY }
-    });
-    const json = await res.json();
-    return json.record || null;
-  } catch { return null; }
+// ─── BROADCAST CHANNEL (sync across open tabs on same device) ─────────────────
+const bc = (typeof BroadcastChannel !== 'undefined') ? new BroadcastChannel('ob_sync') : null;
+if (bc) {
+  bc.onmessage = (e) => {
+    if (e.data === 'updated') {
+      CATEGORIES   = loadLocalCategories();
+      tasks        = loadLocalTasks();
+      adminVersion = loadLocalVersion();
+      clicks       = loadLocalClicks();
+      completed    = loadLocalCompleted();
+      render();
+      showToast('🔄 รายการอัปเดตแล้ว!');
+    }
+  };
 }
-
-async function pushCloud(data) {
-  if (!USE_CLOUD) return;
-  try {
-    await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_API_KEY },
-      body: JSON.stringify(data)
-    });
-  } catch(e) { console.warn('Cloud save failed', e); }
-}
+function broadcastUpdate() { if (bc) bc.postMessage('updated'); }
 
 // ─── LOCAL STORAGE (per-user progress only) ───────────────────────────────────
 function getLocalVersion()      { return localStorage.getItem('ob_user_ver') || '0'; }
@@ -937,28 +902,12 @@ let clicks     = {};
 let completed  = [];
 let adminVersion = '0';
 
-// ─── INIT: load cloud or local ────────────────────────────────────────────────
+// ─── INIT: load from localStorage ─────────────────────────────────────────────
 async function initData() {
-  showLoadingBanner(true);
-  if (USE_CLOUD) {
-    cloudData = await fetchCloud();
-    if (cloudData && cloudData.tasks) {
-      CATEGORIES   = cloudData.categories || JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
-      tasks        = cloudData.tasks;
-      adminVersion = cloudData.version || '0';
-    } else {
-      // First time: push defaults to cloud
-      cloudData = { categories: CATEGORIES, tasks, version: String(Date.now()) };
-      await pushCloud(cloudData);
-      adminVersion = cloudData.version;
-    }
-  } else {
-    CATEGORIES   = loadLocalCategories();
-    tasks        = loadLocalTasks();
-    adminVersion = loadLocalVersion();
-  }
+  CATEGORIES   = loadLocalCategories();
+  tasks        = loadLocalTasks();
+  adminVersion = loadLocalVersion();
 
-  // Check if admin changed data since user last loaded
   const userVer = getLocalVersion();
   if (adminVersion !== '0' && adminVersion !== userVer) {
     completed = [];
@@ -971,42 +920,25 @@ async function initData() {
     completed = loadLocalCompleted();
   }
 
-  showLoadingBanner(false);
   render();
-
-  // Poll every 10s for admin changes (cloud) or 5s (local)
-  setInterval(pollForUpdates, USE_CLOUD ? 10000 : 5000);
+  setInterval(pollForUpdates, 5000);
 }
 
 async function pollForUpdates() {
-  let newVersion = adminVersion;
-  if (USE_CLOUD) {
-    const fresh = await fetchCloud();
-    if (!fresh) return;
-    newVersion = fresh.version || '0';
-    if (newVersion !== adminVersion) {
-      adminVersion = newVersion;
-      CATEGORIES   = fresh.categories || CATEGORIES;
-      tasks        = fresh.tasks || tasks;
-      cloudData    = fresh;
+  const newVersion = loadLocalVersion();
+  if (newVersion !== adminVersion) {
+    adminVersion = newVersion;
+    CATEGORIES   = loadLocalCategories();
+    tasks        = loadLocalTasks();
+    if (newVersion !== getLocalVersion()) {
+      completed = [];
+      clicks    = {};
+      saveLocalCompleted([]);
+      saveLocalClicks({});
+      setLocalVersion(newVersion);
+      showToast('🔄 รายการอัปเดตแล้ว!');
     }
-  } else {
-    newVersion = loadLocalVersion();
-    if (newVersion !== adminVersion) {
-      adminVersion = newVersion;
-      CATEGORIES   = loadLocalCategories();
-      tasks        = loadLocalTasks();
-    }
-  }
-  // If version changed, reset user progress
-  if (newVersion !== getLocalVersion()) {
-    completed = [];
-    clicks    = {};
-    saveLocalCompleted([]);
-    saveLocalClicks({});
-    setLocalVersion(newVersion);
     render();
-    showToast('🔄 รายการอัปเดตแล้ว!');
   }
 }
 
@@ -1020,18 +952,12 @@ function showLoadingBanner(show) {
 async function adminSave() {
   const newVer = String(Date.now());
   adminVersion = newVer;
-  if (USE_CLOUD) {
-    cloudData = { categories: CATEGORIES, tasks, version: newVer };
-    showToast('⏳ กำลังบันทึก...');
-    await pushCloud(cloudData);
-    showToast('✅ บันทึกแล้ว — ทุกคนเห็นทันที!');
-  } else {
-    saveLocalCategories(CATEGORIES);
-    saveLocalTasks(tasks);
-    saveLocalVersion(newVer);
-    showToast('✅ บันทึกแล้ว (local only — ดู Setup)');
-  }
-  setLocalVersion(newVer); // admin's own session stays in sync
+  saveLocalCategories(CATEGORIES);
+  saveLocalTasks(tasks);
+  saveLocalVersion(newVer);
+  setLocalVersion(newVer);
+  broadcastUpdate();
+  showToast('✅ บันทึกแล้ว!');
 }
 
 // ─── RENDER MAIN ─────────────────────────────────────────────────────────────
@@ -1137,13 +1063,7 @@ function renderAdminPanel() {
   document.getElementById('statClicks').textContent = totalClicks;
   document.getElementById('statDone').textContent   = done;
 
-  // Cloud status
-  const statusEl = document.getElementById('cloudStatus');
-  if (statusEl) {
-    statusEl.innerHTML = USE_CLOUD
-      ? '🟢 <strong>Cloud เปิดใช้งาน</strong> — การเปลี่ยนแปลงส่งถึงทุกคน'
-      : '🟡 <strong>Local เท่านั้น</strong> — ดู <a href="#setupGuide" onclick="document.getElementById(\'setupGuide\').style.display=\'block\'">วิธี Setup JSONBin</a> เพื่อแชร์ทุกคน';
-  }
+
 
   // Refresh newCat select
   const newCatEl = document.getElementById('newCat');
