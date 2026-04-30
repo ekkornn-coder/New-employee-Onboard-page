@@ -583,6 +583,77 @@
     color: var(--gray);
     font-size: 13px;
   }
+  .cat-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    border: 1px solid var(--gray-light);
+    border-radius: 10px;
+    margin-bottom: 8px;
+    background: white;
+    transition: box-shadow 0.2s;
+  }
+  .cat-item.dragging { opacity: 0.5; box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+  .cat-drag-handle {
+    color: var(--gray);
+    font-size: 18px;
+    cursor: grab;
+    padding: 0 4px;
+    user-select: none;
+    flex-shrink: 0;
+  }
+  .cat-drag-handle:active { cursor: grabbing; }
+  .cat-order-badge {
+    background: var(--navy);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .cat-info { flex: 1; min-width: 0; }
+  .cat-name { font-size: 14px; font-weight: 600; color: var(--navy); }
+  .cat-meta { font-size: 11px; color: var(--gray); margin-top: 2px; }
+  .cat-edit-form {
+    display: none;
+    width: 100%;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--gray-light);
+    flex-direction: column;
+    gap: 8px;
+  }
+  .cat-edit-form.open { display: flex; }
+  .cat-edit-form input {
+    padding: 9px 12px;
+    border: 2px solid var(--gray-light);
+    border-radius: 8px;
+    font-family: 'Sarabun', sans-serif;
+    font-size: 13px;
+    outline: none;
+    width: 100%;
+    transition: border-color 0.2s;
+  }
+  .cat-edit-form input:focus { border-color: var(--teal); }
+  .order-btns { display: flex; gap: 6px; }
+  .order-btn {
+    flex: 1;
+    padding: 9px;
+    border: 2px solid var(--gray-light);
+    border-radius: 8px;
+    background: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .order-btn:hover { background: var(--off-white); border-color: var(--teal); }
+  .order-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
   .all-done-banner {
     background: linear-gradient(135deg, var(--success), #2ECC71);
@@ -683,6 +754,20 @@
   </div>
   <div class="admin-body">
 
+    <!-- Categories -->
+    <div class="admin-section">
+      <h3>🗂️ จัดการหมวดหมู่ · Manage Categories</h3>
+      <div id="adminCatList"></div>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--gray-light)">
+        <div style="font-size:12px;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">➕ เพิ่มหมวดหมู่ใหม่</div>
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <input type="text" id="newCatIcon" placeholder="🏷️" maxlength="4" style="width:52px;padding:10px;border:2px solid var(--gray-light);border-radius:8px;font-size:18px;text-align:center;outline:none;font-family:'Sarabun',sans-serif;">
+          <input type="text" id="newCatLabel" placeholder="ชื่อหมวดหมู่" style="flex:1;padding:10px 12px;border:2px solid var(--gray-light);border-radius:8px;font-family:'Sarabun',sans-serif;font-size:13px;outline:none;">
+        </div>
+        <button onclick="addCategory()" style="width:100%;padding:11px;background:linear-gradient(135deg,var(--teal),var(--teal-light));color:white;border:none;border-radius:8px;font-family:'Prompt',sans-serif;font-size:14px;font-weight:600;cursor:pointer;">+ เพิ่มหมวดหมู่</button>
+      </div>
+    </div>
+
     <!-- Stats -->
     <div class="admin-section">
       <h3>📊 สถิติภาพรวม</h3>
@@ -710,12 +795,7 @@
       <h3>➕ เพิ่มรายการใหม่</h3>
       <div class="form-row">
         <label>หมวดหมู่ / Category</label>
-        <select id="newCat">
-          <option value="ยอมรับข้อตกลง">📋 ยอมรับข้อตกลง</option>
-          <option value="Update size เสื้อ">👕 Update size เสื้อ</option>
-          <option value="Update size รองเท้า">👟 Update size รองเท้า</option>
-          <option value="update สายรถ">🏷️ update สายรถ</option>
-        </select>
+        <select id="newCat"></select>
       </div>
       <div class="form-row">
         <label>ชื่อรายการ / Task Name</label>
@@ -763,12 +843,39 @@
 // ─── DATA ────────────────────────────────────────────────────────────────────
 const ADMIN_PW = '212224236';
 
-const CATEGORIES = [
-  { id: 'ยอมรับข้อตกลง', label: 'ยอมรับข้อตกลง', icon: '📋', colorClass: 'navy' },
-  { id: 'Update size เสื้อ', label: 'Update size เสื้อ', icon: '👕', colorClass: 'teal' },
-  { id: 'Update size รองเท้า', label: 'Update size รองเท้า', icon: '👟', colorClass: 'gold' },
-  { id: 'update สายรถ', label: 'update สายรถ', icon: '🚌', colorClass: 'green' },
+const DEFAULT_CATEGORIES = [
+  { id: 'ยอมรับข้อตกลง', label: 'ยอมรับข้อตกลง', icon: '📋', colorClass: 'navy', order: 0 },
+  { id: 'Update size เสื้อ', label: 'Update size เสื้อ', icon: '👕', colorClass: 'teal', order: 1 },
+  { id: 'Update size รองเท้า', label: 'Update size รองเท้า', icon: '👟', colorClass: 'gold', order: 2 },
+  { id: 'update สายรถ', label: 'update สายรถ', icon: '🚌', colorClass: 'green', order: 3 },
 ];
+const COLOR_CLASSES = ['navy','teal','gold','green'];
+
+function loadCategories() {
+  try {
+    const saved = localStorage.getItem('ob_categories');
+    return saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+  } catch { return JSON.parse(JSON.stringify(DEFAULT_CATEGORIES)); }
+}
+function saveCategories(cats) {
+  localStorage.setItem('ob_categories', JSON.stringify(cats));
+  bumpMasterVersion();
+}
+
+let CATEGORIES = loadCategories();
+
+// Poll for category/task changes from admin (every 5s) so other open tabs refresh
+setInterval(() => {
+  const master = getMasterVersion();
+  const user = getUserVersion();
+  if (master !== '0' && master !== user) {
+    CATEGORIES = loadCategories();
+    tasks = loadTasks();
+    clicks = loadClicks();
+    completed = loadCompleted();
+    render();
+  }
+}, 5000);
 
 const DEFAULT_TASKS = [
   { id: 't1', cat: 'ยอมรับข้อตกลง', title: 'ยอมรับข้อบังคับบริษัท', sub: 'Company Regulations', icon: '📄', link: '#' },
@@ -836,7 +943,7 @@ function render() {
   const container = document.getElementById('taskContainer');
   container.innerHTML = '';
 
-  CATEGORIES.forEach(cat => {
+  [...CATEGORIES].sort((a,b)=>a.order-b.order).forEach(cat => {
     const catTasks = tasks.filter(t => t.cat === cat.id);
     if (!catTasks.length) return;
 
@@ -958,6 +1065,15 @@ function renderAdminPanel() {
   document.getElementById('statTotal').textContent = tasks.length;
   document.getElementById('statClicks').textContent = totalClicks;
   document.getElementById('statDone').textContent = done;
+
+  // Refresh newCat select
+  const newCatEl = document.getElementById('newCat');
+  if (newCatEl) {
+    newCatEl.innerHTML = CATEGORIES.map(c => `<option value="${c.id}">${c.icon} ${c.label}</option>`).join('');
+  }
+
+  // Render category editor
+  renderAdminCats();
 
   // Task list
   const list = document.getElementById('adminTaskList');
@@ -1102,6 +1218,114 @@ document.querySelectorAll('.overlay').forEach(el => {
     if (e.target === el) el.classList.remove('show');
   });
 });
+
+// ─── CATEGORY MANAGEMENT ──────────────────────────────────────────────────────
+function renderAdminCats() {
+  const list = document.getElementById('adminCatList');
+  if (!list) return;
+  list.innerHTML = '';
+  const sorted = [...CATEGORIES].sort((a,b) => a.order - b.order);
+  sorted.forEach((cat, idx) => {
+    const taskCount = tasks.filter(t => t.cat === cat.id).length;
+    const div = document.createElement('div');
+    div.className = 'cat-item';
+    div.setAttribute('data-cat-id', cat.id);
+    div.innerHTML = `
+      <div class="cat-order-badge">${idx + 1}</div>
+      <div style="font-size:22px;flex-shrink:0">${cat.icon}</div>
+      <div class="cat-info">
+        <div class="cat-name">${cat.label}</div>
+        <div class="cat-meta">${taskCount} รายการ · สี: ${cat.colorClass}</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        <button onclick="moveCat('${cat.id}',-1)" style="background:var(--off-white);border:1px solid var(--gray-light);border-radius:6px;padding:6px 10px;cursor:pointer;font-size:14px;" ${idx===0?'disabled':''}>▲</button>
+        <button onclick="moveCat('${cat.id}',1)" style="background:var(--off-white);border:1px solid var(--gray-light);border-radius:6px;padding:6px 10px;cursor:pointer;font-size:14px;" ${idx===sorted.length-1?'disabled':''}>▼</button>
+        <button class="edit-btn" onclick="toggleCatEdit('${cat.id}')">✏️</button>
+      </div>
+      <div class="cat-edit-form" id="catEdit_${cat.id}">
+        <div style="display:flex;gap:8px">
+          <input type="text" id="ce_icon_${cat.id}" value="${cat.icon}" maxlength="4" style="width:52px;text-align:center;font-size:18px;">
+          <input type="text" id="ce_label_${cat.id}" value="${cat.label}" placeholder="ชื่อหมวดหมู่" style="flex:1">
+        </div>
+        <div style="font-size:11px;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:.5px">สีการ์ด</div>
+        <div style="display:flex;gap:6px">
+          ${COLOR_CLASSES.map(c => `<button onclick="setCatColor('${cat.id}','${c}')" style="flex:1;padding:8px 4px;border:2px solid ${c===cat.colorClass?'var(--teal)':'var(--gray-light)'};border-radius:8px;background:white;cursor:pointer;font-size:11px;font-weight:600;color:${c===cat.colorClass?'var(--teal)':'var(--gray)'}">${c}</button>`).join('')}
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="edit-cancel-btn" onclick="toggleCatEdit('${cat.id}')">ยกเลิก</button>
+          <button class="edit-save-btn" onclick="saveCatEdit('${cat.id}')">💾 บันทึก</button>
+        </div>
+      </div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+function toggleCatEdit(id) {
+  const form = document.getElementById('catEdit_' + id);
+  if (form) form.classList.toggle('open');
+}
+
+function setCatColor(catId, colorClass) {
+  const idx = CATEGORIES.findIndex(c => c.id === catId);
+  if (idx === -1) return;
+  CATEGORIES[idx].colorClass = colorClass;
+  renderAdminCats();
+  // re-open the edit form
+  setTimeout(() => {
+    const form = document.getElementById('catEdit_' + catId);
+    if (form) form.classList.add('open');
+  }, 50);
+}
+
+function saveCatEdit(id) {
+  const idx = CATEGORIES.findIndex(c => c.id === id);
+  if (idx === -1) return;
+  const newLabel = document.getElementById('ce_label_' + id).value.trim();
+  const newIcon  = document.getElementById('ce_icon_'  + id).value.trim() || '📋';
+  if (!newLabel) { showToast('⚠️ กรุณาใส่ชื่อหมวดหมู่'); return; }
+
+  // Update tasks that belong to this category if id changes (we keep id stable, only change label/icon)
+  CATEGORIES[idx].label = newLabel;
+  CATEGORIES[idx].icon  = newIcon;
+  saveCategories(CATEGORIES);
+  renderAdminPanel();
+  showToast('✅ บันทึกหมวดหมู่แล้ว!');
+}
+
+function moveCat(id, dir) {
+  const sorted = [...CATEGORIES].sort((a,b) => a.order - b.order);
+  const pos = sorted.findIndex(c => c.id === id);
+  const newPos = pos + dir;
+  if (newPos < 0 || newPos >= sorted.length) return;
+  // Swap order values
+  const thisOrder = sorted[pos].order;
+  const otherOrder = sorted[newPos].order;
+  const thisIdx = CATEGORIES.findIndex(c => c.id === sorted[pos].id);
+  const otherIdx = CATEGORIES.findIndex(c => c.id === sorted[newPos].id);
+  CATEGORIES[thisIdx].order = otherOrder;
+  CATEGORIES[otherIdx].order = thisOrder;
+  saveCategories(CATEGORIES);
+  renderAdminCats();
+  // refresh newCat dropdown
+  const newCatEl = document.getElementById('newCat');
+  if (newCatEl) newCatEl.innerHTML = CATEGORIES.sort((a,b)=>a.order-b.order).map(c=>`<option value="${c.id}">${c.icon} ${c.label}</option>`).join('');
+}
+
+function addCategory() {
+  const icon  = document.getElementById('newCatIcon').value.trim() || '📋';
+  const label = document.getElementById('newCatLabel').value.trim();
+  if (!label) { showToast('⚠️ กรุณาใส่ชื่อหมวดหมู่'); return; }
+  const id = label; // use label as id for simplicity
+  if (CATEGORIES.find(c => c.id === id)) { showToast('⚠️ หมวดหมู่นี้มีอยู่แล้ว'); return; }
+  const colorClass = COLOR_CLASSES[CATEGORIES.length % COLOR_CLASSES.length];
+  CATEGORIES.push({ id, label, icon, colorClass, order: CATEGORIES.length });
+  saveCategories(CATEGORIES);
+  document.getElementById('newCatIcon').value = '';
+  document.getElementById('newCatLabel').value = '';
+  renderAdminPanel();
+  showToast('✅ เพิ่มหมวดหมู่แล้ว!');
+}
 
 // ─── EDIT TASK ───────────────────────────────────────────────────────────────
 function toggleEditForm(id) {
