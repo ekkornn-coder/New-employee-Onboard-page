@@ -696,6 +696,12 @@
 </div>
 
 <!-- ─── MAIN ─── -->
+<div id="loadingBanner" style="display:none;position:fixed;inset:0;background:rgba(13,27,42,0.85);z-index:999;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:white;font-family:'Prompt',sans-serif;">
+  <div style="font-size:36px">⏳</div>
+  <div style="font-size:16px;font-weight:600">กำลังโหลดข้อมูล...</div>
+  <div style="font-size:12px;opacity:0.7">Loading from cloud</div>
+</div>
+
 <div class="main">
   <div class="welcome-card">
     <h2>ยินดีต้อนรับ! 🎉</h2>
@@ -753,6 +759,20 @@
     <h2>⚙️ Admin Panel</h2>
   </div>
   <div class="admin-body">
+    <!-- Cloud status -->
+    <div id="cloudStatus" style="background:white;border-radius:12px;padding:14px 16px;margin-bottom:12px;font-size:13px;box-shadow:0 2px 8px rgba(0,0,0,0.08);line-height:1.6;"></div>
+
+    <!-- Setup guide (hidden by default) -->
+    <div id="setupGuide" style="display:none;background:#FFF8E6;border:2px solid var(--gold);border-radius:12px;padding:16px;margin-bottom:12px;font-size:13px;line-height:1.7;">
+      <div style="font-family:'Prompt',sans-serif;font-weight:700;font-size:15px;margin-bottom:8px">📖 วิธี Setup JSONBin (ฟรี)</div>
+      1. ไปที่ <a href="https://jsonbin.io" target="_blank" style="color:var(--teal)"><strong>jsonbin.io</strong></a> → Sign Up ฟรี<br>
+      2. กด <strong>+ Create Bin</strong> → ใส่ <code>{}</code> → Create<br>
+      3. Copy <strong>Bin ID</strong> (ตัวเลขยาวๆ ใน URL)<br>
+      4. ไปที่ API Keys → Copy <strong>Master Key</strong><br>
+      5. เปิดไฟล์ onboard.html → หาบรรทัด:<br>
+      <code style="background:#eee;padding:4px 8px;border-radius:4px;display:block;margin:6px 0">const JSONBIN_BIN_ID  = '';<br>const JSONBIN_API_KEY = '';</code>
+      6. วาง Bin ID และ API Key ลงไป → บันทึกไฟล์ → Push ขึ้น GitHub อีกครั้ง ✅
+    </div>
 
     <!-- Categories -->
     <div class="admin-section">
@@ -840,130 +860,204 @@
 <div class="toast" id="toast"></div>
 
 <script>
-// ─── DATA ────────────────────────────────────────────────────────────────────
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
 const ADMIN_PW = '212224236';
 
+// JSONBin.io — FREE cloud storage so admin changes reach ALL users
+// SETUP: Go to https://jsonbin.io → Sign up free → Create a Bin with {} → Copy the Bin ID & API Key below
+// The bin will store: { categories: [...], tasks: [...], version: "..." }
+const JSONBIN_BIN_ID  = '69f2e1e9856a6821898c5f6a';
+const JSONBIN_API_KEY = '$2a$10$aHNhApvTYWKfVCihDNM1Pu6ahaTxuob3Q83YES1DN7rU8B9S8bvNC';
+
+// If JSONBin is not configured, falls back to localStorage (single-device only)
+const USE_CLOUD = JSONBIN_BIN_ID !== '' && JSONBIN_API_KEY !== '';
+
+// ─── DEFAULT DATA ─────────────────────────────────────────────────────────────
 const DEFAULT_CATEGORIES = [
-  { id: 'ยอมรับข้อตกลง', label: 'ยอมรับข้อตกลง', icon: '📋', colorClass: 'navy', order: 0 },
-  { id: 'Update size เสื้อ', label: 'Update size เสื้อ', icon: '👕', colorClass: 'teal', order: 1 },
+  { id: 'ยอมรับข้อตกลง',    label: 'ยอมรับข้อตกลง',    icon: '📋', colorClass: 'navy',  order: 0 },
+  { id: 'Update size เสื้อ', label: 'Update size เสื้อ', icon: '👕', colorClass: 'teal',  order: 1 },
   { id: 'Update size รองเท้า', label: 'Update size รองเท้า', icon: '👟', colorClass: 'gold', order: 2 },
-  { id: 'update สายรถ', label: 'update สายรถ', icon: '🚌', colorClass: 'green', order: 3 },
+  { id: 'update สายรถ',      label: 'update สายรถ',      icon: '🚌', colorClass: 'green', order: 3 },
+];
+const DEFAULT_TASKS = [
+  { id: 't1', cat: 'ยอมรับข้อตกลง',    title: 'ยอมรับข้อบังคับบริษัท',  sub: 'Company Regulations',      icon: '📄', link: '#' },
+  { id: 't2', cat: 'ยอมรับข้อตกลง',    title: 'นโยบายความปลอดภัย',       sub: 'Safety Policy',            icon: '⛑️', link: '#' },
+  { id: 't3', cat: 'ยอมรับข้อตกลง',    title: 'จรรยาบรรณพนักงาน',        sub: 'Employee Code of Conduct', icon: '🤝', link: '#' },
+  { id: 't4', cat: 'Update size เสื้อ', title: 'กรอกไซส์เสื้อ',           sub: 'Fill in shirt size (S/M/L/XL/XXL)', icon: '👕', link: '#' },
+  { id: 't5', cat: 'Update size รองเท้า', title: 'กรอกไซส์รองเท้า',       sub: 'Fill in shoe size',        icon: '👟', link: '#' },
+  { id: 't6', cat: 'update สายรถ',      title: 'อัปเดตสายรถ',             sub: 'Bus Route Assignment Update', icon: '🚌', link: '#' },
 ];
 const COLOR_CLASSES = ['navy','teal','gold','green'];
 
-function loadCategories() {
+// ─── CLOUD STORAGE (JSONBin) ──────────────────────────────────────────────────
+let cloudData = null; // { categories, tasks, version }
+
+async function fetchCloud() {
+  if (!USE_CLOUD) return null;
   try {
-    const saved = localStorage.getItem('ob_categories');
-    return saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
-  } catch { return JSON.parse(JSON.stringify(DEFAULT_CATEGORIES)); }
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
+      headers: { 'X-Master-Key': JSONBIN_API_KEY }
+    });
+    const json = await res.json();
+    return json.record || null;
+  } catch { return null; }
 }
-function saveCategories(cats) {
-  localStorage.setItem('ob_categories', JSON.stringify(cats));
-  bumpMasterVersion();
-}
 
-let CATEGORIES = loadCategories();
-
-// Poll for category/task changes from admin (every 5s) so other open tabs refresh
-setInterval(() => {
-  const master = getMasterVersion();
-  const user = getUserVersion();
-  if (master !== '0' && master !== user) {
-    CATEGORIES = loadCategories();
-    tasks = loadTasks();
-    clicks = loadClicks();
-    completed = loadCompleted();
-    render();
-  }
-}, 5000);
-
-const DEFAULT_TASKS = [
-  { id: 't1', cat: 'ยอมรับข้อตกลง', title: 'ยอมรับข้อบังคับบริษัท', sub: 'Company Regulations', icon: '📄', link: '#' },
-  { id: 't2', cat: 'ยอมรับข้อตกลง', title: 'นโยบายความปลอดภัย', sub: 'Safety Policy', icon: '⛑️', link: '#' },
-  { id: 't3', cat: 'ยอมรับข้อตกลง', title: 'จรรยาบรรณพนักงาน', sub: 'Employee Code of Conduct', icon: '🤝', link: '#' },
-  { id: 't4', cat: 'Update size เสื้อ', title: 'กรอกไซส์เสื้อ', sub: 'Fill in shirt size (S/M/L/XL/XXL)', icon: '👕', link: '#' },
-  { id: 't5', cat: 'Update size รองเท้า', title: 'กรอกไซส์รองเท้า', sub: 'Fill in shoe size', icon: '👟', link: '#' },
-  { id: 't6', cat: 'update สายรถ', title: 'อัปเดตสายรถ', sub: 'Bus Route Assignment Update', icon: '🚌', link: '#' },
-];
-
-function loadTasks() {
+async function pushCloud(data) {
+  if (!USE_CLOUD) return;
   try {
-    const master = getMasterVersion();
-    const userVer = getUserVersion();
-    if (master !== '0' && master !== userVer) {
-      localStorage.removeItem('ob_completed');
-      localStorage.removeItem('ob_clicks');
-      setUserVersion(master);
+    await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_API_KEY },
+      body: JSON.stringify(data)
+    });
+  } catch(e) { console.warn('Cloud save failed', e); }
+}
+
+// ─── LOCAL STORAGE (per-user progress only) ───────────────────────────────────
+function getLocalVersion()      { return localStorage.getItem('ob_user_ver') || '0'; }
+function setLocalVersion(v)     { localStorage.setItem('ob_user_ver', v); }
+function loadLocalClicks()      { try { return JSON.parse(localStorage.getItem('ob_clicks') || '{}'); } catch { return {}; } }
+function saveLocalClicks(c)     { localStorage.setItem('ob_clicks', JSON.stringify(c)); }
+function loadLocalCompleted()   { try { return JSON.parse(localStorage.getItem('ob_completed') || '[]'); } catch { return []; } }
+function saveLocalCompleted(a)  { localStorage.setItem('ob_completed', JSON.stringify(a)); }
+
+// ─── LOCAL FALLBACK (when cloud not configured) ───────────────────────────────
+function loadLocalCategories()  { try { const s = localStorage.getItem('ob_categories'); return s ? JSON.parse(s) : JSON.parse(JSON.stringify(DEFAULT_CATEGORIES)); } catch { return JSON.parse(JSON.stringify(DEFAULT_CATEGORIES)); } }
+function saveLocalCategories(c) { localStorage.setItem('ob_categories', JSON.stringify(c)); }
+function loadLocalTasks()       { try { const s = localStorage.getItem('ob_tasks'); return s ? JSON.parse(s) : JSON.parse(JSON.stringify(DEFAULT_TASKS)); } catch { return JSON.parse(JSON.stringify(DEFAULT_TASKS)); } }
+function saveLocalTasks(t)      { localStorage.setItem('ob_tasks', JSON.stringify(t)); }
+function loadLocalVersion()     { return localStorage.getItem('ob_master_ver') || '0'; }
+function saveLocalVersion(v)    { localStorage.setItem('ob_master_ver', v); }
+
+// ─── APP STATE ────────────────────────────────────────────────────────────────
+let CATEGORIES = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+let tasks      = JSON.parse(JSON.stringify(DEFAULT_TASKS));
+let clicks     = {};
+let completed  = [];
+let adminVersion = '0';
+
+// ─── INIT: load cloud or local ────────────────────────────────────────────────
+async function initData() {
+  showLoadingBanner(true);
+  if (USE_CLOUD) {
+    cloudData = await fetchCloud();
+    if (cloudData && cloudData.tasks) {
+      CATEGORIES   = cloudData.categories || JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+      tasks        = cloudData.tasks;
+      adminVersion = cloudData.version || '0';
+    } else {
+      // First time: push defaults to cloud
+      cloudData = { categories: CATEGORIES, tasks, version: String(Date.now()) };
+      await pushCloud(cloudData);
+      adminVersion = cloudData.version;
     }
-    const saved = localStorage.getItem('ob_tasks');
-    return saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DEFAULT_TASKS));
-  } catch { return JSON.parse(JSON.stringify(DEFAULT_TASKS)); }
+  } else {
+    CATEGORIES   = loadLocalCategories();
+    tasks        = loadLocalTasks();
+    adminVersion = loadLocalVersion();
+  }
+
+  // Check if admin changed data since user last loaded
+  const userVer = getLocalVersion();
+  if (adminVersion !== '0' && adminVersion !== userVer) {
+    completed = [];
+    clicks    = {};
+    saveLocalCompleted([]);
+    saveLocalClicks({});
+    setLocalVersion(adminVersion);
+  } else {
+    clicks    = loadLocalClicks();
+    completed = loadLocalCompleted();
+  }
+
+  showLoadingBanner(false);
+  render();
+
+  // Poll every 10s for admin changes (cloud) or 5s (local)
+  setInterval(pollForUpdates, USE_CLOUD ? 10000 : 5000);
 }
 
-// ─── VERSION SYSTEM: admin changes broadcast to all users ─────────────────────
-function getMasterVersion() { return localStorage.getItem('ob_master_ver') || '0'; }
-function setMasterVersion(v) { localStorage.setItem('ob_master_ver', v); }
-function getUserVersion() { return localStorage.getItem('ob_user_ver') || '0'; }
-function setUserVersion(v) { localStorage.setItem('ob_user_ver', v); }
-function bumpMasterVersion() {
-  const next = String(Date.now());
-  setMasterVersion(next);
-  setUserVersion(next);
+async function pollForUpdates() {
+  let newVersion = adminVersion;
+  if (USE_CLOUD) {
+    const fresh = await fetchCloud();
+    if (!fresh) return;
+    newVersion = fresh.version || '0';
+    if (newVersion !== adminVersion) {
+      adminVersion = newVersion;
+      CATEGORIES   = fresh.categories || CATEGORIES;
+      tasks        = fresh.tasks || tasks;
+      cloudData    = fresh;
+    }
+  } else {
+    newVersion = loadLocalVersion();
+    if (newVersion !== adminVersion) {
+      adminVersion = newVersion;
+      CATEGORIES   = loadLocalCategories();
+      tasks        = loadLocalTasks();
+    }
+  }
+  // If version changed, reset user progress
+  if (newVersion !== getLocalVersion()) {
+    completed = [];
+    clicks    = {};
+    saveLocalCompleted([]);
+    saveLocalClicks({});
+    setLocalVersion(newVersion);
+    render();
+    showToast('🔄 รายการอัปเดตแล้ว!');
+  }
 }
 
-function saveTasks(tasks) {
-  localStorage.setItem('ob_tasks', JSON.stringify(tasks));
-  bumpMasterVersion();
+function showLoadingBanner(show) {
+  let el = document.getElementById('loadingBanner');
+  if (!el) return;
+  el.style.display = show ? 'flex' : 'none';
 }
 
-function loadClicks() {
-  try { return JSON.parse(localStorage.getItem('ob_clicks') || '{}'); }
-  catch { return {}; }
+// ─── SAVE ADMIN DATA ─────────────────────────────────────────────────────────
+async function adminSave() {
+  const newVer = String(Date.now());
+  adminVersion = newVer;
+  if (USE_CLOUD) {
+    cloudData = { categories: CATEGORIES, tasks, version: newVer };
+    showToast('⏳ กำลังบันทึก...');
+    await pushCloud(cloudData);
+    showToast('✅ บันทึกแล้ว — ทุกคนเห็นทันที!');
+  } else {
+    saveLocalCategories(CATEGORIES);
+    saveLocalTasks(tasks);
+    saveLocalVersion(newVer);
+    showToast('✅ บันทึกแล้ว (local only — ดู Setup)');
+  }
+  setLocalVersion(newVer); // admin's own session stays in sync
 }
 
-function saveClicks(clicks) {
-  localStorage.setItem('ob_clicks', JSON.stringify(clicks));
-}
-
-function loadCompleted() {
-  try { return JSON.parse(localStorage.getItem('ob_completed') || '[]'); }
-  catch { return []; }
-}
-
-function saveCompleted(arr) {
-  localStorage.setItem('ob_completed', JSON.stringify(arr));
-}
-
-let tasks = loadTasks();
-let clicks = loadClicks();
-let completed = loadCompleted();
-
-// ─── RENDER ───────────────────────────────────────────────────────────────────
+// ─── RENDER MAIN ─────────────────────────────────────────────────────────────
 function render() {
   const container = document.getElementById('taskContainer');
   container.innerHTML = '';
+  const sortedCats = [...CATEGORIES].sort((a,b) => a.order - b.order);
 
-  [...CATEGORIES].sort((a,b)=>a.order-b.order).forEach(cat => {
+  sortedCats.forEach(cat => {
     const catTasks = tasks.filter(t => t.cat === cat.id);
     if (!catTasks.length) return;
-
     const label = document.createElement('div');
     label.className = 'category-label';
     label.textContent = cat.icon + '  ' + cat.label;
     container.appendChild(label);
 
     catTasks.forEach(task => {
-      const isDone = completed.includes(task.id);
+      const isDone     = completed.includes(task.id);
       const clickCount = clicks[task.id] || 0;
-      const catInfo = CATEGORIES.find(c => c.id === task.cat);
-
+      const catInfo    = CATEGORIES.find(c => c.id === task.cat);
       const card = document.createElement('a');
       card.className = 'task-card' + (isDone ? ' completed' : '');
-      card.href = task.link || '#';
+      card.href   = task.link || '#';
       card.target = '_blank';
-      card.rel = 'noopener noreferrer';
+      card.rel    = 'noopener noreferrer';
       card.onclick = (e) => handleTaskClick(e, task.id, task.link);
-
       card.innerHTML = `
         ${clickCount > 0 ? `<div class="click-count">👆 ${clickCount}</div>` : ''}
         <div class="task-inner">
@@ -973,12 +1067,8 @@ function render() {
             ${task.sub ? `<div class="task-sub">${task.sub}</div>` : ''}
             <div class="task-badge ${isDone ? 'done' : ''}">${isDone ? '✓ เสร็จแล้ว' : 'กดเพื่อดำเนินการ'}</div>
           </div>
-          ${isDone
-            ? `<div class="task-check">✓</div>`
-            : `<div class="task-arrow">›</div>`
-          }
+          ${isDone ? `<div class="task-check">✓</div>` : `<div class="task-arrow">›</div>`}
         </div>`;
-
       container.appendChild(card);
     });
   });
@@ -989,103 +1079,88 @@ function render() {
 }
 
 function handleTaskClick(e, taskId, link) {
-  // Track click
   clicks[taskId] = (clicks[taskId] || 0) + 1;
-  saveClicks(clicks);
-
-  // Mark complete after click (user visited link)
+  saveLocalClicks(clicks);
   if (!completed.includes(taskId)) {
     completed.push(taskId);
-    saveCompleted(completed);
+    saveLocalCompleted(completed);
   }
-
-  // If no real link, prevent navigation
   if (!link || link === '#') {
     e.preventDefault();
     showToast('✅ บันทึกแล้ว!');
   }
-
   setTimeout(() => render(), 300);
 }
 
 function updateProgress() {
   const total = tasks.length;
-  const done = completed.filter(id => tasks.find(t => t.id === id)).length;
-  const pct = total ? Math.round((done / total) * 100) : 0;
+  const done  = completed.filter(id => tasks.find(t => t.id === id)).length;
+  const pct   = total ? Math.round((done / total) * 100) : 0;
   document.getElementById('progressFill').style.width = pct + '%';
   document.getElementById('progressLabel').textContent = `${done} / ${total} รายการ`;
 }
-
 function updateFooter() {
   const total = tasks.length;
-  const done = completed.filter(id => tasks.find(t => t.id === id)).length;
+  const done  = completed.filter(id => tasks.find(t => t.id === id)).length;
   document.getElementById('footerCount').textContent = `${done}/${total} เสร็จแล้ว`;
 }
-
 function updateAllDoneBanner() {
   const total = tasks.length;
-  const done = completed.filter(id => tasks.find(t => t.id === id)).length;
+  const done  = completed.filter(id => tasks.find(t => t.id === id)).length;
   document.getElementById('allDoneBanner').style.display = (total && done === total) ? 'block' : 'none';
 }
 
-// ─── ADMIN ────────────────────────────────────────────────────────────────────
+// ─── ADMIN AUTH ───────────────────────────────────────────────────────────────
 function openAdminLogin() {
   document.getElementById('pwInput').value = '';
   document.getElementById('pwError').style.display = 'none';
   document.getElementById('loginOverlay').classList.add('show');
   setTimeout(() => document.getElementById('pwInput').focus(), 300);
 }
-
 function checkPw() {
   const val = document.getElementById('pwInput').value.trim();
-  if (val === ADMIN_PW) {
-    closeModal('loginOverlay');
-    openAdmin();
-  } else {
+  if (val === ADMIN_PW) { closeModal('loginOverlay'); openAdmin(); }
+  else {
     document.getElementById('pwError').style.display = 'block';
     document.getElementById('pwInput').value = '';
     document.getElementById('pwInput').focus();
   }
 }
+function openAdmin() { renderAdminPanel(); document.getElementById('adminPanel').classList.add('show'); }
+function closeAdmin() { document.getElementById('adminPanel').classList.remove('show'); render(); }
 
-function openAdmin() {
-  renderAdminPanel();
-  document.getElementById('adminPanel').classList.add('show');
-}
-
-function closeAdmin() {
-  document.getElementById('adminPanel').classList.remove('show');
-  render();
-}
-
+// ─── ADMIN PANEL RENDER ───────────────────────────────────────────────────────
 function renderAdminPanel() {
-  // Stats
   const totalClicks = Object.values(clicks).reduce((s, v) => s + v, 0);
   const done = completed.filter(id => tasks.find(t => t.id === id)).length;
-  document.getElementById('statTotal').textContent = tasks.length;
+  document.getElementById('statTotal').textContent  = tasks.length;
   document.getElementById('statClicks').textContent = totalClicks;
-  document.getElementById('statDone').textContent = done;
+  document.getElementById('statDone').textContent   = done;
+
+  // Cloud status
+  const statusEl = document.getElementById('cloudStatus');
+  if (statusEl) {
+    statusEl.innerHTML = USE_CLOUD
+      ? '🟢 <strong>Cloud เปิดใช้งาน</strong> — การเปลี่ยนแปลงส่งถึงทุกคน'
+      : '🟡 <strong>Local เท่านั้น</strong> — ดู <a href="#setupGuide" onclick="document.getElementById(\'setupGuide\').style.display=\'block\'">วิธี Setup JSONBin</a> เพื่อแชร์ทุกคน';
+  }
 
   // Refresh newCat select
   const newCatEl = document.getElementById('newCat');
   if (newCatEl) {
-    newCatEl.innerHTML = CATEGORIES.map(c => `<option value="${c.id}">${c.icon} ${c.label}</option>`).join('');
+    newCatEl.innerHTML = [...CATEGORIES].sort((a,b)=>a.order-b.order)
+      .map(c => `<option value="${c.id}">${c.icon} ${c.label}</option>`).join('');
   }
-
-  // Render category editor
   renderAdminCats();
 
   // Task list
   const list = document.getElementById('adminTaskList');
   list.innerHTML = '';
-  if (!tasks.length) {
-    list.innerHTML = '<div class="empty-state">ยังไม่มีรายการ</div>';
-    return;
-  }
+  if (!tasks.length) { list.innerHTML = '<div class="empty-state">ยังไม่มีรายการ</div>'; return; }
 
   tasks.forEach(task => {
     const clickCount = clicks[task.id] || 0;
-    const isDone = completed.includes(task.id);
+    const isDone     = completed.includes(task.id);
     const div = document.createElement('div');
     div.className = 'admin-task-item';
     div.style.flexWrap = 'wrap';
@@ -1093,19 +1168,17 @@ function renderAdminPanel() {
       <div style="font-size:22px;flex-shrink:0">${task.icon || '📋'}</div>
       <div class="admin-task-info">
         <div class="admin-task-title">${task.title}</div>
-        <div class="admin-task-meta">
-          ${task.cat} · 👆${clickCount} คลิก · ${isDone ? '✅ เสร็จ' : '⏳ ยังไม่เสร็จ'}
-        </div>
+        <div class="admin-task-meta">${task.cat} · 👆${clickCount} คลิก · ${isDone ? '✅ เสร็จ' : '⏳ ยังไม่เสร็จ'}</div>
       </div>
       <div style="display:flex;gap:6px;flex-shrink:0">
         <button class="edit-btn" onclick="toggleEditForm('${task.id}')">✏️ แก้ไข</button>
-        <button class="del-btn" onclick="deleteTask('${task.id}')">🗑️ ลบ</button>
+        <button class="del-btn"  onclick="deleteTask('${task.id}')">🗑️ ลบ</button>
       </div>
       <div class="edit-form" id="editForm_${task.id}">
         <div class="edit-form-row">
           <div class="edit-form-field" style="flex:1">
             <div class="edit-form-label">ไอคอน</div>
-            <input type="text" id="ei_icon_${task.id}" value="${task.icon || '📋'}" maxlength="4" style="font-size:18px;text-align:center">
+            <input type="text" id="ei_icon_${task.id}"  value="${task.icon || '📋'}" maxlength="4" style="font-size:18px;text-align:center">
           </div>
           <div class="edit-form-field" style="flex:3">
             <div class="edit-form-label">ชื่อรายการ</div>
@@ -1119,7 +1192,7 @@ function renderAdminPanel() {
         <div class="edit-form-field">
           <div class="edit-form-label">หมวดหมู่</div>
           <select id="ei_cat_${task.id}">
-            ${CATEGORIES.map(c => `<option value="${c.id}" ${c.id === task.cat ? 'selected' : ''}>${c.icon} ${c.label}</option>`).join('')}
+            ${CATEGORIES.map(c=>`<option value="${c.id}" ${c.id===task.cat?'selected':''}>${c.icon} ${c.label}</option>`).join('')}
           </select>
         </div>
         <div class="edit-form-field">
@@ -1128,96 +1201,12 @@ function renderAdminPanel() {
         </div>
         <div class="edit-form-row">
           <button class="edit-cancel-btn" onclick="toggleEditForm('${task.id}')">ยกเลิก</button>
-          <button class="edit-save-btn" onclick="saveEditTask('${task.id}')">💾 บันทึก</button>
+          <button class="edit-save-btn"   onclick="saveEditTask('${task.id}')">💾 บันทึก</button>
         </div>
-      </div>
-    `;
+      </div>`;
     list.appendChild(div);
   });
 }
-
-function addTask() {
-  const cat = document.getElementById('newCat').value;
-  const title = document.getElementById('newTitle').value.trim();
-  const sub = document.getElementById('newSub').value.trim();
-  const icon = document.getElementById('newIcon').value.trim() || '📋';
-  const link = document.getElementById('newLink').value.trim() || '#';
-
-  if (!title) { showToast('⚠️ กรุณาใส่ชื่อรายการ'); return; }
-
-  const newTask = {
-    id: 't' + Date.now(),
-    cat, title, sub, icon, link
-  };
-  tasks.push(newTask);
-  saveTasks(tasks);
-
-  document.getElementById('newTitle').value = '';
-  document.getElementById('newSub').value = '';
-  document.getElementById('newIcon').value = '';
-  document.getElementById('newLink').value = '';
-
-  renderAdminPanel();
-  showToast('✅ เพิ่มรายการแล้ว!');
-}
-
-function deleteTask(id) {
-  if (!confirm('ยืนยันการลบรายการนี้?')) return;
-  tasks = tasks.filter(t => t.id !== id);
-  saveTasks(tasks);
-  completed = completed.filter(c => c !== id);
-  saveCompleted(completed);
-  delete clicks[id];
-  saveClicks(clicks);
-  renderAdminPanel();
-  showToast('🗑️ ลบรายการแล้ว');
-}
-
-// ─── SUMMARY ─────────────────────────────────────────────────────────────────
-function showSummary() {
-  const total = tasks.length;
-  const done = completed.filter(id => tasks.find(t => t.id === id)).length;
-  const pending = total - done;
-
-  document.getElementById('summaryText').textContent =
-    `เสร็จแล้ว ${done} รายการ / ยังไม่เสร็จ ${pending} รายการ`;
-
-  const listEl = document.getElementById('summaryList');
-  listEl.innerHTML = '';
-  tasks.forEach(task => {
-    const isDone = completed.includes(task.id);
-    const row = document.createElement('div');
-    row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #eee;font-size:13px;';
-    row.innerHTML = `
-      <span style="font-size:18px">${isDone ? '✅' : '⏳'}</span>
-      <span style="flex:1;color:${isDone ? '#27AE60' : '#8A9BB0'}">${task.title}</span>
-    `;
-    listEl.appendChild(row);
-  });
-
-  document.getElementById('summaryOverlay').classList.add('show');
-}
-
-// ─── UTILS ────────────────────────────────────────────────────────────────────
-function closeModal(id) {
-  document.getElementById(id).classList.remove('show');
-}
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.remove('show');
-  void t.offsetWidth;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2100);
-}
-
-// Close overlay on backdrop click
-document.querySelectorAll('.overlay').forEach(el => {
-  el.addEventListener('click', e => {
-    if (e.target === el) el.classList.remove('show');
-  });
-});
 
 // ─── CATEGORY MANAGEMENT ──────────────────────────────────────────────────────
 function renderAdminCats() {
@@ -1229,7 +1218,6 @@ function renderAdminCats() {
     const taskCount = tasks.filter(t => t.cat === cat.id).length;
     const div = document.createElement('div');
     div.className = 'cat-item';
-    div.setAttribute('data-cat-id', cat.id);
     div.innerHTML = `
       <div class="cat-order-badge">${idx + 1}</div>
       <div style="font-size:22px;flex-shrink:0">${cat.icon}</div>
@@ -1239,149 +1227,170 @@ function renderAdminCats() {
       </div>
       <div style="display:flex;gap:6px;flex-shrink:0">
         <button onclick="moveCat('${cat.id}',-1)" style="background:var(--off-white);border:1px solid var(--gray-light);border-radius:6px;padding:6px 10px;cursor:pointer;font-size:14px;" ${idx===0?'disabled':''}>▲</button>
-        <button onclick="moveCat('${cat.id}',1)" style="background:var(--off-white);border:1px solid var(--gray-light);border-radius:6px;padding:6px 10px;cursor:pointer;font-size:14px;" ${idx===sorted.length-1?'disabled':''}>▼</button>
+        <button onclick="moveCat('${cat.id}',1)"  style="background:var(--off-white);border:1px solid var(--gray-light);border-radius:6px;padding:6px 10px;cursor:pointer;font-size:14px;" ${idx===sorted.length-1?'disabled':''}>▼</button>
         <button class="edit-btn" onclick="toggleCatEdit('${cat.id}')">✏️</button>
       </div>
       <div class="cat-edit-form" id="catEdit_${cat.id}">
         <div style="display:flex;gap:8px">
-          <input type="text" id="ce_icon_${cat.id}" value="${cat.icon}" maxlength="4" style="width:52px;text-align:center;font-size:18px;">
+          <input type="text" id="ce_icon_${cat.id}"  value="${cat.icon}"  maxlength="4" style="width:52px;text-align:center;font-size:18px;">
           <input type="text" id="ce_label_${cat.id}" value="${cat.label}" placeholder="ชื่อหมวดหมู่" style="flex:1">
         </div>
         <div style="font-size:11px;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:.5px">สีการ์ด</div>
         <div style="display:flex;gap:6px">
-          ${COLOR_CLASSES.map(c => `<button onclick="setCatColor('${cat.id}','${c}')" style="flex:1;padding:8px 4px;border:2px solid ${c===cat.colorClass?'var(--teal)':'var(--gray-light)'};border-radius:8px;background:white;cursor:pointer;font-size:11px;font-weight:600;color:${c===cat.colorClass?'var(--teal)':'var(--gray)'}">${c}</button>`).join('')}
+          ${COLOR_CLASSES.map(c=>`<button onclick="setCatColor('${cat.id}','${c}')" style="flex:1;padding:8px 4px;border:2px solid ${c===cat.colorClass?'var(--teal)':'var(--gray-light)'};border-radius:8px;background:white;cursor:pointer;font-size:11px;font-weight:600;color:${c===cat.colorClass?'var(--teal)':'var(--gray)'}">${c}</button>`).join('')}
         </div>
         <div style="display:flex;gap:8px">
           <button class="edit-cancel-btn" onclick="toggleCatEdit('${cat.id}')">ยกเลิก</button>
-          <button class="edit-save-btn" onclick="saveCatEdit('${cat.id}')">💾 บันทึก</button>
+          <button class="edit-save-btn"   onclick="saveCatEdit('${cat.id}')">💾 บันทึก</button>
         </div>
-      </div>
-    `;
+      </div>`;
     list.appendChild(div);
   });
 }
 
-function toggleCatEdit(id) {
-  const form = document.getElementById('catEdit_' + id);
-  if (form) form.classList.toggle('open');
-}
-
+function toggleCatEdit(id) { const f = document.getElementById('catEdit_'+id); if(f) f.classList.toggle('open'); }
 function setCatColor(catId, colorClass) {
-  const idx = CATEGORIES.findIndex(c => c.id === catId);
-  if (idx === -1) return;
+  const idx = CATEGORIES.findIndex(c=>c.id===catId);
+  if(idx===-1) return;
   CATEGORIES[idx].colorClass = colorClass;
   renderAdminCats();
-  // re-open the edit form
-  setTimeout(() => {
-    const form = document.getElementById('catEdit_' + catId);
-    if (form) form.classList.add('open');
-  }, 50);
+  setTimeout(()=>{ const f=document.getElementById('catEdit_'+catId); if(f) f.classList.add('open'); },50);
 }
-
-function saveCatEdit(id) {
-  const idx = CATEGORIES.findIndex(c => c.id === id);
-  if (idx === -1) return;
-  const newLabel = document.getElementById('ce_label_' + id).value.trim();
-  const newIcon  = document.getElementById('ce_icon_'  + id).value.trim() || '📋';
-  if (!newLabel) { showToast('⚠️ กรุณาใส่ชื่อหมวดหมู่'); return; }
-
-  // Update tasks that belong to this category if id changes (we keep id stable, only change label/icon)
+async function saveCatEdit(id) {
+  const idx = CATEGORIES.findIndex(c=>c.id===id);
+  if(idx===-1) return;
+  const newLabel = document.getElementById('ce_label_'+id).value.trim();
+  const newIcon  = document.getElementById('ce_icon_'+id).value.trim() || '📋';
+  if(!newLabel) { showToast('⚠️ กรุณาใส่ชื่อหมวดหมู่'); return; }
   CATEGORIES[idx].label = newLabel;
   CATEGORIES[idx].icon  = newIcon;
-  saveCategories(CATEGORIES);
+  await adminSave();
   renderAdminPanel();
-  showToast('✅ บันทึกหมวดหมู่แล้ว!');
 }
-
-function moveCat(id, dir) {
-  const sorted = [...CATEGORIES].sort((a,b) => a.order - b.order);
-  const pos = sorted.findIndex(c => c.id === id);
+async function moveCat(id, dir) {
+  const sorted = [...CATEGORIES].sort((a,b)=>a.order-b.order);
+  const pos = sorted.findIndex(c=>c.id===id);
   const newPos = pos + dir;
-  if (newPos < 0 || newPos >= sorted.length) return;
-  // Swap order values
-  const thisOrder = sorted[pos].order;
-  const otherOrder = sorted[newPos].order;
-  const thisIdx = CATEGORIES.findIndex(c => c.id === sorted[pos].id);
-  const otherIdx = CATEGORIES.findIndex(c => c.id === sorted[newPos].id);
-  CATEGORIES[thisIdx].order = otherOrder;
-  CATEGORIES[otherIdx].order = thisOrder;
-  saveCategories(CATEGORIES);
+  if(newPos<0||newPos>=sorted.length) return;
+  const ti = CATEGORIES.findIndex(c=>c.id===sorted[pos].id);
+  const oi = CATEGORIES.findIndex(c=>c.id===sorted[newPos].id);
+  const tmp = CATEGORIES[ti].order;
+  CATEGORIES[ti].order = CATEGORIES[oi].order;
+  CATEGORIES[oi].order = tmp;
+  await adminSave();
   renderAdminCats();
-  // refresh newCat dropdown
   const newCatEl = document.getElementById('newCat');
-  if (newCatEl) newCatEl.innerHTML = CATEGORIES.sort((a,b)=>a.order-b.order).map(c=>`<option value="${c.id}">${c.icon} ${c.label}</option>`).join('');
+  if(newCatEl) newCatEl.innerHTML = [...CATEGORIES].sort((a,b)=>a.order-b.order).map(c=>`<option value="${c.id}">${c.icon} ${c.label}</option>`).join('');
 }
-
-function addCategory() {
-  const icon  = document.getElementById('newCatIcon').value.trim() || '📋';
+async function addCategory() {
+  const icon  = document.getElementById('newCatIcon').value.trim()  || '📋';
   const label = document.getElementById('newCatLabel').value.trim();
-  if (!label) { showToast('⚠️ กรุณาใส่ชื่อหมวดหมู่'); return; }
-  const id = label; // use label as id for simplicity
-  if (CATEGORIES.find(c => c.id === id)) { showToast('⚠️ หมวดหมู่นี้มีอยู่แล้ว'); return; }
+  if(!label) { showToast('⚠️ กรุณาใส่ชื่อหมวดหมู่'); return; }
+  if(CATEGORIES.find(c=>c.id===label)) { showToast('⚠️ หมวดหมู่นี้มีอยู่แล้ว'); return; }
   const colorClass = COLOR_CLASSES[CATEGORIES.length % COLOR_CLASSES.length];
-  CATEGORIES.push({ id, label, icon, colorClass, order: CATEGORIES.length });
-  saveCategories(CATEGORIES);
-  document.getElementById('newCatIcon').value = '';
+  CATEGORIES.push({ id: label, label, icon, colorClass, order: CATEGORIES.length });
+  await adminSave();
+  document.getElementById('newCatIcon').value  = '';
   document.getElementById('newCatLabel').value = '';
   renderAdminPanel();
-  showToast('✅ เพิ่มหมวดหมู่แล้ว!');
 }
 
-// ─── EDIT TASK ───────────────────────────────────────────────────────────────
-function toggleEditForm(id) {
-  const form = document.getElementById('editForm_' + id);
-  if (form) form.classList.toggle('open');
-}
-
-function saveEditTask(id) {
-  const idx = tasks.findIndex(t => t.id === id);
-  if (idx === -1) return;
-
-  const title = document.getElementById('ei_title_' + id).value.trim();
-  if (!title) { showToast('⚠️ กรุณาใส่ชื่อรายการ'); return; }
-
-  tasks[idx] = {
-    ...tasks[idx],
-    icon:  document.getElementById('ei_icon_'  + id).value.trim() || '📋',
-    title: title,
-    sub:   document.getElementById('ei_sub_'   + id).value.trim(),
-    cat:   document.getElementById('ei_cat_'   + id).value,
-    link:  document.getElementById('ei_link_'  + id).value.trim() || '#',
+// ─── TASK CRUD ────────────────────────────────────────────────────────────────
+function toggleEditForm(id) { const f=document.getElementById('editForm_'+id); if(f) f.classList.toggle('open'); }
+async function saveEditTask(id) {
+  const idx = tasks.findIndex(t=>t.id===id);
+  if(idx===-1) return;
+  const title = document.getElementById('ei_title_'+id).value.trim();
+  if(!title) { showToast('⚠️ กรุณาใส่ชื่อรายการ'); return; }
+  tasks[idx] = { ...tasks[idx],
+    icon:  document.getElementById('ei_icon_' +id).value.trim() || '📋',
+    title,
+    sub:   document.getElementById('ei_sub_'  +id).value.trim(),
+    cat:   document.getElementById('ei_cat_'  +id).value,
+    link:  document.getElementById('ei_link_' +id).value.trim() || '#',
   };
-  saveTasks(tasks);
+  await adminSave();
   renderAdminPanel();
-  showToast('✅ บันทึกการแก้ไขแล้ว!');
+}
+async function addTask() {
+  const cat   = document.getElementById('newCat').value;
+  const title = document.getElementById('newTitle').value.trim();
+  const sub   = document.getElementById('newSub').value.trim();
+  const icon  = document.getElementById('newIcon').value.trim() || '📋';
+  const link  = document.getElementById('newLink').value.trim() || '#';
+  if(!title) { showToast('⚠️ กรุณาใส่ชื่อรายการ'); return; }
+  tasks.push({ id: 't'+Date.now(), cat, title, sub, icon, link });
+  await adminSave();
+  document.getElementById('newTitle').value = '';
+  document.getElementById('newSub').value   = '';
+  document.getElementById('newIcon').value  = '';
+  document.getElementById('newLink').value  = '';
+  renderAdminPanel();
+}
+async function deleteTask(id) {
+  if(!confirm('ยืนยันการลบรายการนี้?')) return;
+  tasks     = tasks.filter(t=>t.id!==id);
+  completed = completed.filter(c=>c!==id);
+  delete clicks[id];
+  saveLocalCompleted(completed);
+  saveLocalClicks(clicks);
+  await adminSave();
+  renderAdminPanel();
+}
+async function adminResetAll() {
+  if(!confirm('⚠️ รีเซ็ตความคืบหน้าของพนักงานทุกคน?\nThis will reset progress for ALL users.')) return;
+  completed = []; clicks = {};
+  saveLocalCompleted([]); saveLocalClicks({});
+  await adminSave();
+  renderAdminPanel();
+  showToast('🔄 รีเซ็ตทุกคนแล้ว!');
 }
 
-// ─── RESET ───────────────────────────────────────────────────────────────────
-function openReset() {
-  document.getElementById('resetOverlay').classList.add('show');
-}
-
+// ─── RESET (user) ─────────────────────────────────────────────────────────────
+function openReset() { document.getElementById('resetOverlay').classList.add('show'); }
 function confirmReset() {
-  completed = [];
-  clicks = {};
-  saveCompleted(completed);
-  saveClicks(clicks);
+  completed = []; clicks = {};
+  saveLocalCompleted([]); saveLocalClicks({});
   closeModal('resetOverlay');
   render();
   showToast('🔄 รีเซ็ตเรียบร้อยแล้ว!');
 }
 
-// Admin reset (from admin panel) - also bumps version so ALL users reset
-function adminResetAll() {
-  if (!confirm('⚠️ รีเซ็ตความคืบหน้าของพนักงานทุกคน?\nThis will reset progress for ALL users.')) return;
-  completed = [];
-  clicks = {};
-  saveCompleted(completed);
-  saveClicks(clicks);
-  bumpMasterVersion();
-  renderAdminPanel();
-  showToast('🔄 รีเซ็ตทุกคนแล้ว!');
+// ─── SUMMARY ──────────────────────────────────────────────────────────────────
+function showSummary() {
+  const total   = tasks.length;
+  const done    = completed.filter(id=>tasks.find(t=>t.id===id)).length;
+  const pending = total - done;
+  document.getElementById('summaryText').textContent = `เสร็จแล้ว ${done} รายการ / ยังไม่เสร็จ ${pending} รายการ`;
+  const listEl = document.getElementById('summaryList');
+  listEl.innerHTML = '';
+  tasks.forEach(task => {
+    const isDone = completed.includes(task.id);
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #eee;font-size:13px;';
+    row.innerHTML = `<span style="font-size:18px">${isDone?'✅':'⏳'}</span><span style="flex:1;color:${isDone?'#27AE60':'#8A9BB0'}">${task.title}</span>`;
+    listEl.appendChild(row);
+  });
+  document.getElementById('summaryOverlay').classList.add('show');
 }
 
+// ─── UTILS ────────────────────────────────────────────────────────────────────
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.remove('show');
+  void t.offsetWidth;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2500);
+}
+document.querySelectorAll('.overlay').forEach(el => {
+  el.addEventListener('click', e => { if(e.target===el) el.classList.remove('show'); });
+});
+
 // ─── INIT ─────────────────────────────────────────────────────────────────────
-render();
+initData();
 </script>
+
 </body>
 </html>
