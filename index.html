@@ -577,6 +577,104 @@
     100%{opacity:0}
   }
 
+  /* ─── 3D STEP SCENE ─── */
+  .step3d {
+    position: relative; height: 210px; border-radius: var(--radius);
+    overflow: hidden; margin-bottom: 12px; box-shadow: var(--card-shadow);
+    background: linear-gradient(180deg, #DCEEFB 0%, #F5F7FA 100%);
+  }
+  .step3d canvas { width: 100%; height: 100%; display: block; touch-action: pan-y; }
+  .step3d-hint {
+    position: absolute; left: 10px; bottom: 10px; font-size: 11px; color: var(--navy);
+    background: rgba(255,255,255,.88); padding: 4px 10px; border-radius: 99px; pointer-events: none;
+  }
+  .step3d-count {
+    position: absolute; right: 10px; top: 10px; font-family: 'Prompt', sans-serif;
+    font-size: 12px; font-weight: 700; color: white; background: var(--navy);
+    padding: 4px 10px; border-radius: 99px; pointer-events: none;
+  }
+  .step-no {
+    display: inline-block; background: var(--navy); color: #fff; font-size: 10px;
+    font-weight: 700; padding: 2px 8px; border-radius: 99px; margin-right: 6px; margin-top: 5px;
+  }
+  .task-card.pulse { animation: cardPulse 1.2s ease; }
+  @keyframes cardPulse {
+    0%,100% { box-shadow: var(--card-shadow); }
+    30% { box-shadow: 0 0 0 4px var(--gold), var(--card-shadow); }
+  }
+
+  /* ─── SNAKE GAME ─── */
+  .game-card {
+    display: flex; align-items: center; gap: 14px; margin-top: 24px; padding: 16px;
+    border-radius: var(--radius); cursor: pointer; color: white; border: none; width: 100%;
+    background: linear-gradient(135deg, #0D1B2A 0%, #1B4D3E 100%); box-shadow: var(--card-shadow);
+    text-align: left; font-family: 'Sarabun', sans-serif;
+  }
+  .game-card:active { transform: scale(0.98); }
+  .game-card .gc-icon {
+    width: 48px; height: 48px; border-radius: 12px; background: rgba(255,255,255,.12);
+    display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0;
+  }
+  .game-card .gc-title { font-family: 'Prompt', sans-serif; font-size: 15px; font-weight: 600; }
+  .game-card .gc-sub { font-size: 12px; opacity: .75; margin-top: 2px; }
+  .game-card .gc-best { margin-left: auto; text-align: right; font-size: 11px; opacity: .8; flex-shrink: 0; }
+  .game-card .gc-best b { display: block; font-family: 'Prompt', sans-serif; font-size: 18px; color: var(--gold); }
+
+  .snake-panel {
+    position: fixed; inset: 0; z-index: 400; background: #0D1B2A; color: white;
+    display: none; flex-direction: column; align-items: center;
+    padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
+  }
+  .snake-panel.show { display: flex; }
+  .snake-top { width: 100%; max-width: 420px; display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .snake-top h2 { font-family: 'Prompt', sans-serif; font-size: 17px; flex: 1; }
+  .snake-close {
+    background: rgba(255,255,255,.12); border: none; color: white; border-radius: 8px;
+    padding: 8px 14px; font-family: 'Sarabun', sans-serif; font-size: 13px; cursor: pointer;
+  }
+  .snake-note { width: 100%; max-width: 420px; font-size: 12px; opacity: .65; margin-bottom: 10px; }
+  .snake-scores { width: 100%; max-width: 420px; display: flex; gap: 8px; margin-bottom: 10px; }
+  .snake-scores div { flex: 1; background: rgba(255,255,255,.08); border-radius: 10px; padding: 8px; text-align: center; font-size: 11px; opacity: .9; }
+  .snake-scores b { display: block; font-family: 'Prompt', sans-serif; font-size: 20px; color: var(--gold); }
+  .snake-board { position: relative; width: 100%; max-width: 420px; aspect-ratio: 1; touch-action: none; }
+  .snake-board canvas { width: 100%; height: 100%; display: block; border-radius: 14px; }
+  .snake-msg {
+    position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 10px; background: rgba(13,27,42,.78); border-radius: 14px; text-align: center;
+  }
+  .snake-msg h3 { font-family: 'Prompt', sans-serif; font-size: 22px; }
+  .snake-msg p { font-size: 13px; opacity: .8; }
+  .snake-msg button {
+    background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: var(--navy); border: none;
+    border-radius: 12px; padding: 12px 28px; font-family: 'Prompt', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer;
+  }
+  .snake-pad { display: grid; grid-template-columns: repeat(3, 64px); grid-template-rows: repeat(2, 56px); gap: 8px; margin-top: auto; padding-top: 14px; }
+  .snake-pad button {
+    border: none; border-radius: 14px; background: rgba(255,255,255,.12); color: white;
+    font-size: 22px; cursor: pointer; touch-action: manipulation;
+  }
+  .snake-pad button:active { background: rgba(244,185,66,.5); }
+  .snake-pad .up { grid-column: 2; grid-row: 1; }
+  .snake-pad .left { grid-column: 1; grid-row: 2; }
+  .snake-pad .down { grid-column: 2; grid-row: 2; }
+  .snake-pad .right { grid-column: 3; grid-row: 2; }
+  .app-ver { font-size: 11px; opacity: .6; }
+  .who-chip {
+    display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; max-width: 100%;
+    background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); color: white;
+    border-radius: 99px; padding: 5px 12px; font-family: 'Sarabun', sans-serif; font-size: 12px; cursor: pointer;
+  }
+  .who-chip b { color: var(--gold); }
+  .who-chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .modal label.fld { display: block; font-size: 12px; font-weight: 600; color: var(--gray); margin-bottom: 4px; }
+  .prefill-badge { display: inline-block; background: #E3F2FD; color: var(--teal); font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 99px; margin-left: 4px; }
+  .link-hint { font-size: 11px; color: var(--gray); line-height: 1.6; background: var(--off-white); border-radius: 8px; padding: 8px 10px; }
+  .link-hint code { background: white; padding: 1px 5px; border-radius: 4px; color: var(--teal); font-weight: 700; }
+  .game-card.locked { background: linear-gradient(135deg, #5B6B7D 0%, #3E4C5B 100%); }
+  .game-card.locked .gc-best { opacity: .45; }
+  .gc-lockbar { height: 5px; background: rgba(255,255,255,.18); border-radius: 99px; margin-top: 7px; overflow: hidden; }
+  .gc-lockbar i { display: block; height: 100%; background: var(--gold); border-radius: 99px; transition: width .4s; }
+
   .empty-state {
     text-align: center;
     padding: 20px;
@@ -686,6 +784,7 @@
       Admin
     </button>
   </div>
+  <button class="who-chip" id="whoChip" onclick="openProfile(true)" style="display:none">👤 <span id="whoText"></span> · <b>เปลี่ยน</b></button>
   <div class="progress-bar-wrap">
     <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
   </div>
@@ -709,6 +808,17 @@
   </div>
 
   <div id="taskContainer"></div>
+
+  <!-- 🎮 Snake game — ไม่นับใน progress -->
+  <button class="game-card" onclick="openSnake()">
+    <div class="gc-icon" id="gcIcon">🐍</div>
+    <div style="flex:1;min-width:0">
+      <div class="gc-title" id="gcTitle">เกมฆ่าเวลาช่วงรอ</div>
+      <div class="gc-sub" id="gcSub">เล่นเกมงูระหว่างรอเรียกชื่อ · ไม่นับในรายการ</div>
+      <div class="gc-lockbar" id="gcLockbar"><i id="gcLockfill" style="width:0%"></i></div>
+    </div>
+    <div class="gc-best">สถิติ<b id="snakeBestCard">0</b></div>
+  </button>
 </div>
 
 <!-- ─── FOOTER ─── -->
@@ -750,10 +860,27 @@
 <div class="admin-panel" id="adminPanel">
   <div class="admin-header">
     <button class="back-btn" onclick="closeAdmin()">← กลับ</button>
-    <h2>⚙️ Admin Panel</h2>
+    <h2>⚙️ Admin Panel <span class="app-ver" id="appVer"></span></h2>
   </div>
   <div class="admin-body">
 
+
+    <!-- How data works -->
+    <div class="admin-section" style="background:#FFF8E6;border:2px solid var(--gold);">
+      <h3 style="border-bottom-color:var(--gold)">📁 ระบบไฟล์ Database</h3>
+      <div style="font-size:13px;line-height:1.7;color:var(--navy)">
+        ข้อมูลโหลดอัตโนมัติจากโฟลเดอร์ <code style="background:#fff;padding:2px 6px;border-radius:4px">data/</code> ทุกครั้งที่เปิดหน้า<br>
+        แก้ไขในหน้านี้ → <strong>ดาวน์โหลด JSON</strong> → วางทับไฟล์เดิม (หรือ push GitHub) → ทุกคนได้รับอัปเดต ✅
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px">
+        <button onclick="downloadAll()" style="padding:12px;background:linear-gradient(135deg,var(--navy),#1a3a5c);color:white;border:none;border-radius:10px;font-family:'Prompt',sans-serif;font-size:14px;font-weight:600;cursor:pointer;">📥 ดาวน์โหลดทั้งหมด (3 ไฟล์)</button>
+        <div style="display:flex;gap:8px">
+          <button onclick="downloadCategories()" style="flex:1;padding:10px;background:white;color:var(--teal);border:2px solid var(--teal);border-radius:8px;font-family:'Sarabun',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">categories.json</button>
+          <button onclick="downloadTasks()" style="flex:1;padding:10px;background:white;color:var(--teal);border:2px solid var(--teal);border-radius:8px;font-family:'Sarabun',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">tasks.json</button>
+          <button onclick="downloadVersion()" style="flex:1;padding:10px;background:white;color:var(--danger);border:2px solid var(--danger);border-radius:8px;font-family:'Sarabun',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">version.json</button>
+        </div>
+      </div>
+    </div>
 
     <!-- Categories -->
     <div class="admin-section">
@@ -813,6 +940,7 @@
       <div class="form-row">
         <label>ลิงก์ / Link URL</label>
         <input type="url" id="newLink" placeholder="https://docs.google.com/forms/...">
+        <div class="link-hint">💡 <b>เติมข้อมูลอัตโนมัติ:</b> ใน Google Form กด ⋮ → <b>รับลิงก์ที่กรอกไว้ล่วงหน้า</b> → พิมพ์ <code>{EMP_ID}</code> ในช่องรหัสพนักงาน และ <code>{NAME}</code> ในช่องชื่อ → กดรับลิงก์ แล้วนำมาวางที่นี่</div>
       </div>
       <button class="add-btn" onclick="addTask()">+ เพิ่มรายการ</button>
     </div>
@@ -823,6 +951,23 @@
       <div id="adminTaskList"></div>
     </div>
 
+  </div>
+</div>
+
+<!-- ─── PROFILE MODAL (กรอกครั้งแรกครั้งเดียว) ─── -->
+<div class="overlay" id="profileOverlay">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h3>👋 กรอกข้อมูลก่อนเริ่ม</h3>
+    <p>กรอกครั้งเดียว ระบบจะใส่ให้อัตโนมัติในทุกแบบฟอร์ม ไม่ต้องพิมพ์ซ้ำ</p>
+    <label class="fld" for="pfEmp">รหัสพนักงาน / Employee ID</label>
+    <input type="text" id="pfEmp" placeholder="เช่น 123456" autocomplete="off" autocapitalize="characters">
+    <label class="fld" for="pfName">ชื่อ-นามสกุล / Full name</label>
+    <input type="text" id="pfName" placeholder="เช่น สมชาย ใจดี" autocomplete="off" onkeydown="if(event.key==='Enter')saveProfile()">
+    <div class="error-msg" id="pfError">⚠️ กรุณากรอกให้ครบทั้ง 2 ช่อง</div>
+    <button class="modal-btn" onclick="saveProfile()">✅ บันทึกและเริ่มเลย</button>
+    <button class="modal-cancel" id="pfSwitch" onclick="switchPerson()" style="display:none;color:var(--danger)">🔁 เปลี่ยนเป็นพนักงานคนอื่น (ล้างความคืบหน้า)</button>
+    <button class="modal-cancel" id="pfCancel" onclick="closeModal('profileOverlay')" style="display:none">ยกเลิก</button>
   </div>
 </div>
 
@@ -837,15 +982,78 @@
   </div>
 </div>
 
+<!-- ─── SNAKE GAME PANEL ─── -->
+<div class="snake-panel" id="snakePanel">
+  <div class="snake-top">
+    <h2>🐍 เกมฆ่าเวลาช่วงรอ</h2>
+    <button class="snake-close" onclick="closeSnake()">✕ ปิด</button>
+  </div>
+  <div class="snake-note">กินกล่องข้าว 🍱 ให้ได้มากที่สุด · ปัดนิ้วบนกระดาน หรือกดปุ่มด้านล่าง</div>
+  <div class="snake-scores">
+    <div>คะแนน<b id="snakeScore">0</b></div>
+    <div>สถิติสูงสุด<b id="snakeBest">0</b></div>
+  </div>
+  <div class="snake-board" id="snakeBoard">
+    <canvas id="snakeCanvas"></canvas>
+    <div class="snake-msg" id="snakeMsg">
+      <h3 id="snakeMsgTitle">พร้อมไหม?</h3>
+      <p id="snakeMsgText">ปัดนิ้ว ↑ ↓ ← → เพื่อเลี้ยวงู<br>อย่าชนกำแพงหรือตัวเอง</p>
+      <button onclick="startSnake()" id="snakeStartBtn">▶ เริ่มเล่น</button>
+    </div>
+  </div>
+  <div class="snake-pad">
+    <button class="up" onclick="snakeTurn(0,-1)" aria-label="ขึ้น">▲</button>
+    <button class="left" onclick="snakeTurn(-1,0)" aria-label="ซ้าย">◀</button>
+    <button class="down" onclick="snakeTurn(0,1)" aria-label="ลง">▼</button>
+    <button class="right" onclick="snakeTurn(1,0)" aria-label="ขวา">▶</button>
+  </div>
+</div>
+
 <!-- ─── TOAST ─── -->
 <div class="toast" id="toast"></div>
 
 <script>
+// ═══════════════════════════════════════════════════════════════════════════
+// 📌 VERSION HISTORY
+//   v2.1  (2026-10-19) กรอกรหัสพนักงาน+ชื่อครั้งเดียว → เติมใน Google Form อัตโนมัติ ({EMP_ID} / {NAME})
+//   v2.0  (2026-10-17) ล็อกเกมงูจนกว่าจะทำรายการครบ (ยกเว้นหมวดสั่งข้าว)
+//   v1.9  (2026-10-17) เพิ่มเกมงู "เกมฆ่าเวลาช่วงรอ" (ไม่นับใน progress)
+//   v1.8  (2026-10-16) ฉาก 3D low-poly ขั้นตอน 1-2-3 (ลงทะเบียนพนักงาน / อื่นๆ)
+//   v1.7  โหลดข้อมูลอัตโนมัติจากโฟลเดอร์ data/ แยกไฟล์ตาม database
+//   v1.6  เปลี่ยนหมวดเป็น สั่งข้าว / ลงทะเบียนพนักงาน / อื่นๆ, ลบ API ภายนอก
+//   v1.4  Admin แก้ไขและเรียงลำดับหมวดหมู่
+//   v1.3  Admin แก้ไขรายการได้
+//   v1.2  ปุ่มรีเซ็ต + ยืนยัน, version sync, สายi5 → สายรถ
+//   v1.1  เปลี่ยนรหัส Admin
+//   v1.0  เวอร์ชันแรก
+// ═══════════════════════════════════════════════════════════════════════════
+const APP_VERSION = 'v2.1';
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
 const ADMIN_PW = '212224236';
 
-// Data stored in localStorage + synced across tabs via BroadcastChannel
-const USE_CLOUD = false;
+// ═══════════════════════════════════════════════════════════════════════════
+// 📁 DATA FOLDER — แก้ path ตรงนี้ได้เลย (relative หรือ absolute URL ก็ได้)
+// ไฟล์ database แยกตามเมนู อยู่ในโฟลเดอร์เดียวกันเสมอ:
+//   ./data/categories.json   ← หมวดหมู่
+//   ./data/tasks.json        ← รายการทั้งหมด
+//   ./data/version.json      ← เปลี่ยนเลข version เพื่อรีเซ็ต progress ทุกคน
+//   ./data/blacklist.json    ← database ของ blacklist
+//   ./data/employees.json    ← database ของ พนักงาน
+//   ./data/target.json       ← database ของ target
+// ═══════════════════════════════════════════════════════════════════════════
+const DATA_FOLDER = './data/';   // ← แก้ path ที่นี่
+
+const DB_FILES = {
+  categories: 'categories.json',
+  tasks:      'tasks.json',
+  version:    'version.json',
+  blacklist:  'blacklist.json',
+  employees:  'employees.json',
+  target:     'target.json',
+};
+
+// เก็บ database เสริมที่โหลดมาอัตโนมัติ (blacklist / employees / target)
+const DB = { blacklist: null, employees: null, target: null };
 
 // ─── DEFAULT DATA ─────────────────────────────────────────────────────────────
 const DEFAULT_CATEGORIES = [
@@ -856,8 +1064,8 @@ const DEFAULT_CATEGORIES = [
 const DEFAULT_TASKS = [
   { id: 't1', cat: 'สั่งข้าว',         title: 'สั่งข้าว', sub: 'กดเพื่อสั่งอาหาร', icon: '🍱', link: 'https://docs.google.com/forms/d/e/1FAIpQLSfYBJCmNFar0rgnIlIXm4PHsJelaSmeAbIJNlAKbPlf9i5RAA/viewform' },
   { id: 't2', cat: 'ลงทะเบียนพนักงาน', title: 'แบบฟอร์มรับทราบเอกสารทรัพย์สินทางปัญญา, BCG และ AUP', sub: 'ฉบับภาษาไทย', icon: '📜', link: 'https://docs.google.com/forms/d/e/1FAIpQLSeTeGqe-3WYpUzqC6XA4yr6dOkWnIr1-P8q-7ByuW5OppjoSQ/viewform' },
-  { id: 't3', cat: 'ลงทะเบียนพนักงาน', title: 'ลงทะเบียนข้อมูลพนักงานสำหรับ Payroll', sub: 'กรอกข้อมูลบังคับสำหรับการจ่ายเงินเดือนและการยื่นตามกฎหมาย', icon: '💰', link: 'https://docs.google.com/forms/d/15ywNo8tdH4Mapen1kCx-q9JuTxJfWZxSNNRYvXbX_0E/viewform?edit_requested=true' },
-  { id: 't4', cat: 'ลงทะเบียนพนักงาน', title: 'ขอความยินยอมข้อมูลชีวมิติ (Biometric)', sub: 'Biometric Data Consent', icon: '🫆', link: 'https://docs.google.com/forms/d/1CKRznKS-9DPrg6kdoydLdQcgQOWWICEeQztxGXAuV3o/viewform?edit_requested=true' },
+  { id: 't3', cat: 'ลงทะเบียนพนักงาน', title: 'ลงทะเบียนข้อมูลพนักงานสำหรับ Payroll', sub: 'กรอกข้อมูลเงินเดือน', icon: '💰', link: 'https://docs.google.com/forms/d/15ywNo8tdH4Mapen1kCx-q9JuTxJfWZxSNNRYvXbX_0E/viewform?edit_requested=true' },
+  { id: 't4', cat: 'ลงทะเบียนพนักงาน', title: 'ขอความยินยอมข้อมูลชีวมิติ (Biometric)', sub: 'Biometric Data Consent', icon: '🖐️', link: 'https://docs.google.com/forms/d/1CKRznKS-9DPrg6kdoydLdQcgQOWWICEeQztxGXAuV3o/viewform?edit_requested=true' },
   { id: 't5', cat: 'อื่นๆ',             title: 'ลงทะเบียนรองเท้า & เสื้อ', sub: 'แจ้งไซส์ชุดพนักงาน', icon: '👟', link: 'https://docs.google.com/forms/d/e/1FAIpQLSdMdTziUm7BLCn2RFit9Hh0pqfxvFAP_4Se1CS41VQ_65NnXw/viewform' },
 ];
 const COLOR_CLASSES = ['navy','teal','gold','green'];
@@ -902,12 +1110,37 @@ let clicks     = {};
 let completed  = [];
 let adminVersion = '0';
 
-// ─── INIT: load from localStorage ─────────────────────────────────────────────
-async function initData() {
-  CATEGORIES   = loadLocalCategories();
-  tasks        = loadLocalTasks();
-  adminVersion = loadLocalVersion();
+// ─── AUTO-LOAD from data folder (ทีมเปิดมาแล้วโหลดเองอัตโนมัติ) ─────────────
+async function fetchJSON(filename) {
+  try {
+    const res = await fetch(DATA_FOLDER + filename + '?t=' + Date.now(), { cache: 'no-store' });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch { return null; }
+}
 
+async function initData() {
+  // 1) โหลดหมวดหมู่ + รายการ จากโฟลเดอร์ data อัตโนมัติ
+  const [cats, tsk, ver, bl, emp, tgt] = await Promise.all([
+    fetchJSON(DB_FILES.categories),
+    fetchJSON(DB_FILES.tasks),
+    fetchJSON(DB_FILES.version),
+    fetchJSON(DB_FILES.blacklist),
+    fetchJSON(DB_FILES.employees),
+    fetchJSON(DB_FILES.target),
+  ]);
+
+  // ใช้ข้อมูลจากไฟล์ถ้าโหลดได้ / fallback เป็น default (เช่นเปิดแบบ file://)
+  CATEGORIES   = Array.isArray(cats) && cats.length ? cats : JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+  tasks        = Array.isArray(tsk)  && tsk.length  ? tsk  : JSON.parse(JSON.stringify(DEFAULT_TASKS));
+  adminVersion = (ver && ver.version) ? String(ver.version) : '0';
+
+  // เก็บ database เสริมไว้ใช้งาน (ดูได้ผ่าน console: DB.blacklist ฯลฯ)
+  DB.blacklist = bl;
+  DB.employees = emp;
+  DB.target    = tgt;
+
+  // 2) เช็ค version — ถ้า admin เปลี่ยน version.json → รีเซ็ต progress ผู้ใช้
   const userVer = getLocalVersion();
   if (adminVersion !== '0' && adminVersion !== userVer) {
     completed = [];
@@ -921,15 +1154,24 @@ async function initData() {
   }
 
   render();
-  setInterval(pollForUpdates, 5000);
+  updateWhoChip();
+  if (!profile) openProfile(false);   // เปิดครั้งแรก → ขอรหัสพนักงาน + ชื่อ
+
+  // 3) โพลไฟล์ version.json ทุก 30 วินาที เผื่อ admin อัปเดตระหว่างเปิดหน้า
+  setInterval(pollForUpdates, 30000);
 }
 
 async function pollForUpdates() {
-  const newVersion = loadLocalVersion();
+  const ver = await fetchJSON(DB_FILES.version);
+  const newVersion = (ver && ver.version) ? String(ver.version) : adminVersion;
   if (newVersion !== adminVersion) {
     adminVersion = newVersion;
-    CATEGORIES   = loadLocalCategories();
-    tasks        = loadLocalTasks();
+    const [cats, tsk] = await Promise.all([
+      fetchJSON(DB_FILES.categories),
+      fetchJSON(DB_FILES.tasks),
+    ]);
+    if (Array.isArray(cats) && cats.length) CATEGORIES = cats;
+    if (Array.isArray(tsk)  && tsk.length)  tasks = tsk;
     if (newVersion !== getLocalVersion()) {
       completed = [];
       clicks    = {};
@@ -949,15 +1191,283 @@ function showLoadingBanner(show) {
 }
 
 // ─── SAVE ADMIN DATA ─────────────────────────────────────────────────────────
+// การแก้ไขใน Admin Panel = แก้ในหน้าจอ (preview) แล้ว "ดาวน์โหลดไฟล์ JSON"
+// เอาไปวางทับใน data/ (หรือ push GitHub) → ทุกคนได้รับอัปเดตอัตโนมัติ
 async function adminSave() {
   const newVer = String(Date.now());
   adminVersion = newVer;
-  saveLocalCategories(CATEGORIES);
-  saveLocalTasks(tasks);
-  saveLocalVersion(newVer);
   setLocalVersion(newVer);
   broadcastUpdate();
-  showToast('✅ บันทึกแล้ว!');
+  showToast('✅ แก้ไขแล้ว — อย่าลืมดาวน์โหลด JSON ไปวางใน data/');
+}
+
+function downloadJSON(obj, filename) {
+  const blob = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function downloadCategories() { downloadJSON(CATEGORIES, 'categories.json'); showToast('📥 ดาวน์โหลด categories.json แล้ว'); }
+function downloadTasks()      { downloadJSON(tasks, 'tasks.json'); showToast('📥 ดาวน์โหลด tasks.json แล้ว'); }
+function downloadVersion()    { downloadJSON({ version: String(Date.now()) }, 'version.json'); showToast('📥 ดาวน์โหลด version.json แล้ว (รีเซ็ตทุกคน)'); }
+function downloadAll() {
+  downloadJSON(CATEGORIES, 'categories.json');
+  setTimeout(() => downloadJSON(tasks, 'tasks.json'), 300);
+  setTimeout(() => downloadJSON({ version: String(Date.now()) }, 'version.json'), 600);
+  showToast('📥 ดาวน์โหลดครบ 3 ไฟล์ → วางทับใน data/');
+}
+
+// ─── 3D STEP SCENES (Three.js low-poly miniature) ────────────────────────────
+// หมวดที่แสดงฉาก 3D ขั้นตอน 1 2 3 — เพิ่ม/ลบชื่อหมวดได้ที่นี่
+const STEP_SCENE_CATS = ['ลงทะเบียนพนักงาน', 'อื่นๆ'];
+const THREE_CDN = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+const stepScenes = {};      // cache ต่อหมวด (ไม่สร้าง WebGL ใหม่ทุกครั้งที่ render)
+let threeState = 'idle';    // idle | loading | ready | failed
+
+function loadThree() {
+  if (threeState !== 'idle') return;
+  threeState = 'loading';
+  const s = document.createElement('script');
+  s.src = THREE_CDN;
+  s.onload  = () => { threeState = 'ready'; render(); };
+  s.onerror = () => { threeState = 'failed'; };
+  document.head.appendChild(s);
+}
+
+const PAL = {
+  navy: 0x0D1B2A, teal: 0x1B6CA8, gold: 0xF4B942, green: 0x27AE60,
+  grass: 0x9BD4A8, grassDark: 0x6FB585, soil: 0xC9A27A, soilDark: 0x9C7650,
+  path: 0xF5F7FA, tree: 0x3E9B6A, trunk: 0x8B5E3C, skin: 0xF2C9A0, white: 0xFFFFFF
+};
+
+function lp(color) {  // low-poly flat material
+  return new THREE.MeshStandardMaterial({ color, flatShading: true, roughness: 0.85, metalness: 0 });
+}
+
+function numberSprite(n, done, current) {
+  const c = document.createElement('canvas'); c.width = c.height = 128;
+  const g = c.getContext('2d');
+  g.fillStyle = done ? '#27AE60' : current ? '#F4B942' : '#0D1B2A';
+  g.beginPath(); g.arc(64, 64, 54, 0, Math.PI * 2); g.fill();
+  g.lineWidth = 10; g.strokeStyle = '#fff'; g.stroke();
+  g.fillStyle = current && !done ? '#0D1B2A' : '#fff';
+  g.font = 'bold 66px Prompt, Sarabun, sans-serif';
+  g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.fillText(done ? '✓' : String(n), 64, 70);
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), depthTest: false }));
+  sp.scale.set(0.62, 0.62, 1); sp.renderOrder = 10;
+  return sp;
+}
+
+function makeWorker() {
+  const g = new THREE.Group();
+  const legs = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.12, 0.18, 6), lp(PAL.navy));
+  legs.position.y = 0.09; g.add(legs);
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.15, 0.24, 6), lp(PAL.teal));
+  body.position.y = 0.3; g.add(body);
+  const head = new THREE.Mesh(new THREE.IcosahedronGeometry(0.13, 0), lp(PAL.skin));
+  head.position.y = 0.53; g.add(head);
+  const hat = new THREE.Mesh(new THREE.SphereGeometry(0.145, 7, 3, 0, Math.PI * 2, 0, Math.PI / 2), lp(PAL.gold));
+  hat.position.y = 0.56; g.add(hat);
+  const brim = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.025, 8), lp(PAL.gold));
+  brim.position.y = 0.56; g.add(brim);
+  return g;
+}
+
+function makeTree(scale) {
+  const g = new THREE.Group();
+  const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.07, 0.25, 5), lp(PAL.trunk));
+  trunk.position.y = 0.12; g.add(trunk);
+  const top = new THREE.Mesh(new THREE.ConeGeometry(0.28, 0.6, 6), lp(PAL.tree));
+  top.position.y = 0.52; g.add(top);
+  g.scale.setScalar(scale);
+  return g;
+}
+
+function makeFlag() {
+  const g = new THREE.Group();
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.6, 5), lp(PAL.white));
+  pole.position.y = 0.3; g.add(pole);
+  const shape = new THREE.Shape(); shape.moveTo(0, 0); shape.lineTo(0.32, -0.1); shape.lineTo(0, -0.2);
+  const flag = new THREE.Mesh(new THREE.ShapeGeometry(shape), new THREE.MeshStandardMaterial({ color: PAL.gold, side: THREE.DoubleSide, roughness: 0.8 }));
+  flag.position.set(0.02, 0.58, 0); g.add(flag);
+  g.userData.flag = flag;
+  return g;
+}
+
+function disposeGroup(obj) {
+  obj.traverse(o => {
+    if (o.geometry) o.geometry.dispose();
+    if (o.material) { if (o.material.map) o.material.map.dispose(); o.material.dispose(); }
+  });
+}
+
+// สร้าง/อัปเดตฉาก 3D ของหมวด — คืน element ที่ใส่ในหน้าได้เลย
+function getStepScene(catId, catTasks) {
+  if (threeState === 'idle') loadThree();
+  if (threeState !== 'ready' || !window.THREE) return null;
+
+  let S = stepScenes[catId];
+  if (!S) S = stepScenes[catId] = createStepScene();
+
+  const sig = catTasks.map(t => t.id + (completed.includes(t.id) ? '1' : '0')).join('|');
+  if (S.sig !== sig) { S.sig = sig; populateStepScene(S, catTasks); }
+  return S.wrap;
+}
+
+function createStepScene() {
+  const wrap = document.createElement('div'); wrap.className = 'step3d';
+  const canvas = document.createElement('canvas'); wrap.appendChild(canvas);
+  const count = document.createElement('div'); count.className = 'step3d-count'; wrap.appendChild(count);
+  const hint = document.createElement('div'); hint.className = 'step3d-hint';
+  hint.textContent = '👆 แตะเสาเพื่อไปที่ขั้นตอน'; wrap.appendChild(hint);
+
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(32, 2, 0.1, 100);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x6a7a8c, 0.5));
+  const sun = new THREE.DirectionalLight(0xfff4e0, 0.75); sun.position.set(4, 8, 6); scene.add(sun);
+  const world = new THREE.Group(); scene.add(world);
+
+  const S = { wrap, canvas, count, renderer, scene, camera, world, pedestals: [], worker: null,
+              target: null, flags: [], currentPed: null, visible: true, sig: null, span: 4 };
+
+  // ขนาด responsive
+  const resize = () => {
+    const w = wrap.clientWidth || 320, hgt = wrap.clientHeight || 210;
+    renderer.setSize(w, hgt, false);
+    camera.aspect = w / hgt;
+    // ถอยกล้องให้เห็นครบทุกเสาบนจอแคบ
+    const dist = Math.max(6, (S.span * 1.25) / camera.aspect + 3.2);
+    camera.position.set(0, dist * 0.62, dist);
+    camera.lookAt(0, 0.4, 0);
+    camera.updateProjectionMatrix();
+  };
+  S.resize = resize;
+  if (window.ResizeObserver) new ResizeObserver(resize).observe(wrap);
+  window.addEventListener('resize', resize);
+
+
+  // แตะเสา → เลื่อนไปการ์ดขั้นตอนนั้น
+  const ray = new THREE.Raycaster(), ptr = new THREE.Vector2();
+  let downAt = null;
+  canvas.addEventListener('pointerdown', e => { downAt = [e.clientX, e.clientY]; });
+  canvas.addEventListener('pointerup', e => {
+    if (!downAt || Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) > 10) return;
+    const r = canvas.getBoundingClientRect();
+    ptr.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+    ray.setFromCamera(ptr, camera);
+    const hit = ray.intersectObjects(S.pedestals, true)[0];
+    if (!hit) return;
+    let o = hit.object; while (o && !o.userData.taskId) o = o.parent;
+    const card = o && document.getElementById('card_' + o.userData.taskId);
+    if (card) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      card.classList.remove('pulse'); void card.offsetWidth; card.classList.add('pulse');
+    }
+  });
+
+  const clock = new THREE.Clock();
+  (function loop() {
+    requestAnimationFrame(loop);
+    // หยุด render ตอนเลื่อนพ้นจอ (ประหยัดแบตมือถือ)
+    if (!wrap.isConnected) return;
+    const rb = wrap.getBoundingClientRect();
+    if (rb.bottom < 0 || rb.top > window.innerHeight) return;
+    const t = clock.getElapsedTime();
+    world.rotation.y = Math.sin(t * 0.35) * 0.22;
+    if (S.worker && S.target) {
+      S.worker.position.x += (S.target.x - S.worker.position.x) * 0.08;
+      S.worker.position.z += (S.target.z - S.worker.position.z) * 0.08;
+      const hop = S.allDone ? Math.abs(Math.sin(t * 6)) * 0.3 : Math.abs(Math.sin(t * 3)) * 0.12;
+      S.worker.position.y = S.target.y + hop;
+      S.worker.rotation.y = S.allDone ? t * 3 : Math.sin(t * 1.5) * 0.4;
+    }
+    if (S.currentPed) S.currentPed.scale.setScalar(1 + Math.sin(t * 4) * 0.04);
+    S.flags.forEach((f, i) => { f.userData.flag.rotation.y = Math.sin(t * 4 + i) * 0.35; });
+    renderer.render(scene, camera);
+  })();
+
+  return S;
+}
+
+function populateStepScene(S, catTasks) {
+  // ล้างของเก่า
+  while (S.world.children.length) { const c = S.world.children[0]; S.world.remove(c); disposeGroup(c); }
+  S.pedestals = []; S.flags = []; S.currentPed = null;
+
+  const n = catTasks.length;
+  const gap = 1.7;
+  S.span = Math.max(1, n - 1) * gap + 1.6;
+  const pos = catTasks.map((_, i) => ({
+    x: (i - (n - 1) / 2) * gap,
+    z: n > 1 ? (i % 2 ? -0.45 : 0.45) : 0,
+    h: 0.28 + i * 0.16           // สูงขึ้นทีละขั้น = ไต่บันไดไปสู่เป้าหมาย
+  }));
+
+  // เกาะลอย low-poly
+  const rx = S.span / 2 + 0.6, rz = 1.8;
+  const top = new THREE.Mesh(new THREE.CylinderGeometry(1, 1.05, 0.28, 9), lp(PAL.grass));
+  top.scale.set(rx, 1, rz); top.position.y = -0.14; S.world.add(top);
+  const soil = new THREE.Mesh(new THREE.ConeGeometry(1.05, 1.1, 9), lp(PAL.soil));
+  soil.rotation.x = Math.PI; soil.scale.set(rx, 1, rz); soil.position.y = -0.83; S.world.add(soil);
+  const rim = new THREE.Mesh(new THREE.CylinderGeometry(1.05, 1.05, 0.06, 9), lp(PAL.grassDark));
+  rim.scale.set(rx, 1, rz); rim.position.y = -0.3; S.world.add(rim);
+
+  // ทางเดินระหว่างขั้น
+  for (let i = 0; i < n - 1; i++) {
+    for (let k = 1; k <= 3; k++) {
+      const f = k / 4;
+      const tile = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 0.05, 6), lp(PAL.path));
+      tile.position.set(pos[i].x + (pos[i + 1].x - pos[i].x) * f, 0.02, pos[i].z + (pos[i + 1].z - pos[i].z) * f);
+      S.world.add(tile);
+    }
+  }
+
+  // ต้นไม้ประดับ (ตำแหน่งคงที่)
+  let seed = n * 97 + 13;
+  const rnd = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+  for (let i = 0; i < 5 + n; i++) {
+    // วางต้นไม้แค่ขอบด้านหลังและด้านข้าง ไม่บังเสา
+    const a = Math.PI + rnd() * Math.PI, rr = 0.82 + rnd() * 0.12;
+    const tx = Math.cos(a) * rx * rr, tz = Math.sin(a) * rz * rr;
+    if (pos.some(p => Math.hypot(p.x - tx, p.z - tz) < 0.85)) continue;
+    const tr = makeTree(0.6 + rnd() * 0.5); tr.position.set(tx, 0, tz); S.world.add(tr);
+  }
+
+  // เสาแต่ละขั้นตอน
+  const curIdx = catTasks.findIndex(t => !completed.includes(t.id));
+  S.allDone = curIdx === -1;
+  catTasks.forEach((task, i) => {
+    const done = completed.includes(task.id), current = i === curIdx;
+    const p = pos[i];
+    const g = new THREE.Group(); g.position.set(p.x, 0, p.z); g.userData.taskId = task.id;
+    const col = done ? PAL.green : current ? PAL.gold : PAL.teal;
+    const ped = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.52, p.h, 6), lp(col));
+    ped.position.y = p.h / 2; g.add(ped);
+    const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.46, 0.46, 0.06, 6), lp(PAL.white));
+    cap.position.y = p.h + 0.03; g.add(cap);
+    const num = numberSprite(i + 1, done, current);
+    num.position.set(0, p.h + (current ? 1.15 : 0.55), 0); g.add(num);
+    if (done) { const fl = makeFlag(); fl.position.set(0.28, p.h + 0.06, -0.15); g.add(fl); S.flags.push(fl); }
+    S.world.add(g); S.pedestals.push(g);
+    if (current) S.currentPed = g;
+  });
+
+  // พนักงานยืนบนขั้นตอนปัจจุบัน (หรือขั้นสุดท้ายถ้าเสร็จครบ)
+  const wi = S.allDone ? n - 1 : curIdx;
+  S.worker = makeWorker(); S.world.add(S.worker);
+  S.target = { x: pos[wi].x - 0.05, y: pos[wi].h + 0.06, z: pos[wi].z + 0.05 };
+  S.worker.position.set(pos[Math.max(0, wi - 1)].x, S.target.y, pos[Math.max(0, wi - 1)].z);
+
+  const done = catTasks.filter(t => completed.includes(t.id)).length;
+  S.count.textContent = S.allDone ? '🎉 ครบทุกขั้นตอน' : `ขั้นตอน ${curIdx + 1} / ${n}`;
+  requestAnimationFrame(S.resize);
 }
 
 // ─── RENDER MAIN ─────────────────────────────────────────────────────────────
@@ -974,13 +1484,20 @@ function render() {
     label.textContent = cat.icon + '  ' + cat.label;
     container.appendChild(label);
 
-    catTasks.forEach(task => {
+    const useSteps = STEP_SCENE_CATS.includes(cat.id);
+    if (useSteps) {
+      const scene3d = getStepScene(cat.id, catTasks);
+      if (scene3d) container.appendChild(scene3d);
+    }
+
+    catTasks.forEach((task, stepIdx) => {
       const isDone     = completed.includes(task.id);
       const clickCount = clicks[task.id] || 0;
       const catInfo    = CATEGORIES.find(c => c.id === task.cat);
       const card = document.createElement('a');
       card.className = 'task-card' + (isDone ? ' completed' : '');
-      card.href   = task.link || '#';
+      card.id = 'card_' + task.id;
+      card.href   = buildLink(task.link);
       card.target = '_blank';
       card.rel    = 'noopener noreferrer';
       card.onclick = (e) => handleTaskClick(e, task.id, task.link);
@@ -991,7 +1508,7 @@ function render() {
           <div class="task-info">
             <div class="task-title">${task.title}</div>
             ${task.sub ? `<div class="task-sub">${task.sub}</div>` : ''}
-            <div class="task-badge ${isDone ? 'done' : ''}">${isDone ? '✓ เสร็จแล้ว' : 'กดเพื่อดำเนินการ'}</div>
+            ${useSteps ? `<span class="step-no">STEP ${stepIdx + 1}</span>` : ''}<div class="task-badge ${isDone ? 'done' : ''}">${isDone ? '✓ เสร็จแล้ว' : 'กดเพื่อดำเนินการ'}</div>
           </div>
           ${isDone ? `<div class="task-check">✓</div>` : `<div class="task-arrow">›</div>`}
         </div>`;
@@ -1002,9 +1519,17 @@ function render() {
   updateProgress();
   updateFooter();
   updateAllDoneBanner();
+  updateGameLock();
 }
 
 function handleTaskClick(e, taskId, link) {
+  // ยังไม่ได้กรอกรหัสพนักงาน → ให้กรอกก่อน แล้วเปิดฟอร์มให้ทันทีหลังบันทึก
+  if (hasPrefill(link) && !profile) {
+    e.preventDefault();
+    pendingTask = { taskId, link };
+    openProfile(false);
+    return;
+  }
   clicks[taskId] = (clicks[taskId] || 0) + 1;
   saveLocalClicks(clicks);
   if (!completed.includes(taskId)) {
@@ -1088,7 +1613,7 @@ function renderAdminPanel() {
       <div style="font-size:22px;flex-shrink:0">${task.icon || '📋'}</div>
       <div class="admin-task-info">
         <div class="admin-task-title">${task.title}</div>
-        <div class="admin-task-meta">${task.cat} · 👆${clickCount} คลิก · ${isDone ? '✅ เสร็จ' : '⏳ ยังไม่เสร็จ'}</div>
+        <div class="admin-task-meta">${task.cat}${hasPrefill(task.link) ? '<span class="prefill-badge">🔗 เติมอัตโนมัติ</span>' : ''} · 👆${clickCount} คลิก · ${isDone ? '✅ เสร็จ' : '⏳ ยังไม่เสร็จ'}</div>
       </div>
       <div style="display:flex;gap:6px;flex-shrink:0">
         <button class="edit-btn" onclick="toggleEditForm('${task.id}')">✏️ แก้ไข</button>
@@ -1116,7 +1641,7 @@ function renderAdminPanel() {
           </select>
         </div>
         <div class="edit-form-field">
-          <div class="edit-form-label">ลิงก์ URL</div>
+          <div class="edit-form-label">ลิงก์ URL · ใส่ {EMP_ID} / {NAME} เพื่อเติมอัตโนมัติ</div>
           <input type="url" id="ei_link_${task.id}" value="${task.link || ''}">
         </div>
         <div class="edit-form-row">
@@ -1305,10 +1830,294 @@ function showToast(msg) {
   setTimeout(()=>t.classList.remove('show'), 2500);
 }
 document.querySelectorAll('.overlay').forEach(el => {
-  el.addEventListener('click', e => { if(e.target===el) el.classList.remove('show'); });
+  el.addEventListener('click', e => {
+    if (e.target !== el) return;
+    if (el.id === 'profileOverlay' && !profile) return;   // ต้องกรอกก่อน ปิดไม่ได้
+    el.classList.remove('show');
+  });
 });
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
+// ─── 👤 EMPLOYEE PROFILE + FORM PREFILL ───────────────────────────────────────
+// ลิงก์ Google Form ที่มีคำแทน {EMP_ID} หรือ {NAME} จะถูกแทนด้วยข้อมูลจริงของพนักงาน
+// (ไม่เติมเลขบัตรประชาชนโดยตั้งใจ — ให้พนักงานพิมพ์เองในฟอร์ม)
+const PREFILL_FIELDS = { EMP_ID: 'emp', NAME: 'name' };
+let profile = loadProfile();
+let pendingTask = null;
+
+function loadProfile() {
+  try { const p = JSON.parse(localStorage.getItem('ob_profile') || 'null'); return p && p.emp ? p : null; }
+  catch { return null; }
+}
+function storeProfile(p) { try { localStorage.setItem('ob_profile', JSON.stringify(p)); } catch {} }
+
+function hasPrefill(link) { return /(\{|%7B)\s*[A-Z_]+\s*(\}|%7D)/i.test(link || ''); }
+
+function buildLink(link) {
+  if (!link || link === '#') return '#';
+  let out = link;
+  Object.entries(PREFILL_FIELDS).forEach(([key, prop]) => {
+    const val = encodeURIComponent(profile ? profile[prop] : '');
+    out = out.replace(new RegExp('(\\{|%7B)\\s*' + key + '\\s*(\\}|%7D)', 'gi'), val);
+  });
+  // คำแทนอื่นที่ไม่รองรับ (เช่น {ID_CARD}) → ล้างทิ้ง ไม่ให้โชว์ในฟอร์ม
+  return out.replace(/(\{|%7B)\s*[A-Z_]+\s*(\}|%7D)/gi, '');
+}
+
+function updateWhoChip() {
+  const chip = document.getElementById('whoChip');
+  if (!profile) { chip.style.display = 'none'; return; }
+  document.getElementById('whoText').textContent = profile.emp + ' · ' + profile.name;
+  chip.style.display = 'inline-flex';
+}
+
+function openProfile(editing) {
+  document.getElementById('pfEmp').value  = profile ? profile.emp  : '';
+  document.getElementById('pfName').value = profile ? profile.name : '';
+  document.getElementById('pfError').style.display = 'none';
+  document.getElementById('pfCancel').style.display = editing && profile ? 'block' : 'none';
+  document.getElementById('pfSwitch').style.display = editing && profile ? 'block' : 'none';
+  document.getElementById('profileOverlay').classList.add('show');
+  setTimeout(() => document.getElementById('pfEmp').focus(), 300);
+}
+
+function saveProfile() {
+  const emp  = document.getElementById('pfEmp').value.trim().toUpperCase().replace(/\s+/g, '');
+  const name = document.getElementById('pfName').value.trim().replace(/\s+/g, ' ');
+  if (!emp || !name) { document.getElementById('pfError').style.display = 'block'; return; }
+  profile = { emp, name, savedAt: new Date().toISOString() };
+  storeProfile(profile);
+  closeModal('profileOverlay');
+  updateWhoChip();
+  render();
+  showToast('✅ บันทึกแล้ว ' + emp);
+  // ถ้ากดฟอร์มค้างไว้ → เปิดให้เลย (อยู่ใน gesture ของปุ่ม เบราว์เซอร์จึงไม่บล็อก)
+  if (pendingTask) {
+    const { taskId, link } = pendingTask; pendingTask = null;
+    window.open(buildLink(link), '_blank', 'noopener');
+    clicks[taskId] = (clicks[taskId] || 0) + 1; saveLocalClicks(clicks);
+    if (!completed.includes(taskId)) { completed.push(taskId); saveLocalCompleted(completed); }
+    setTimeout(render, 300);
+  }
+}
+
+// เครื่องที่ใช้ร่วมกัน (แท็บเล็ตห้องรอ) → เปลี่ยนคนและล้างความคืบหน้าของคนก่อน
+function switchPerson() {
+  if (!confirm('ล้างข้อมูลและความคืบหน้าของคนปัจจุบัน แล้วให้คนใหม่กรอก?')) return;
+  profile = null;
+  try { localStorage.removeItem('ob_profile'); } catch {}
+  completed = []; clicks = {};
+  saveLocalCompleted([]); saveLocalClicks({});
+  updateWhoChip(); render();
+  openProfile(false);
+}
+
+// ─── 🔒 GAME LOCK ─────────────────────────────────────────────────────────────
+// ต้องทำรายการครบก่อนถึงจะเล่นเกมได้ — หมวดในลิสต์นี้ไม่ต้องทำ (เช่น สั่งข้าว)
+const GAME_UNLOCK_SKIP_CATS = ['สั่งข้าว'];
+
+function gameRequiredTasks() { return tasks.filter(t => !GAME_UNLOCK_SKIP_CATS.includes(t.cat)); }
+function gamePendingTasks()  { return gameRequiredTasks().filter(t => !completed.includes(t.id)); }
+function isGameUnlocked()    { return gamePendingTasks().length === 0; }
+
+function updateGameLock() {
+  const card = document.querySelector('.game-card');
+  if (!card) return;
+  const req = gameRequiredTasks().length, pend = gamePendingTasks().length, unlocked = pend === 0;
+  card.classList.toggle('locked', !unlocked);
+  document.getElementById('gcIcon').textContent  = unlocked ? '🐍' : '🔒';
+  document.getElementById('gcTitle').textContent = unlocked ? 'เกมฆ่าเวลาช่วงรอ' : 'เกมฆ่าเวลาช่วงรอ (ล็อกอยู่)';
+  document.getElementById('gcSub').textContent   = unlocked
+    ? 'ปลดล็อกแล้ว! เล่นระหว่างรอเรียกชื่อได้เลย 🎉'
+    : `ทำให้ครบอีก ${pend} รายการเพื่อปลดล็อก (ไม่รวมสั่งข้าว)`;
+  document.getElementById('gcLockbar').style.display = unlocked ? 'none' : 'block';
+  document.getElementById('gcLockfill').style.width = (req ? Math.round((req - pend) / req * 100) : 100) + '%';
+  // ถ้ากำลังเล่นอยู่แต่ถูกรีเซ็ต (เช่น Admin อัปเดตรายการ) → ปิดเกม
+  if (!unlocked && document.getElementById('snakePanel').classList.contains('show')) closeSnake();
+}
+
+// ─── 🐍 SNAKE GAME (เกมฆ่าเวลาช่วงรอ) ─────────────────────────────────────────
+const SNK = { N: 18, snake: [], dir: {x:1,y:0}, next: [], food: null, score: 0,
+              best: 0, timer: null, running: false, speed: 160 };
+
+function snakeLoadBest() { try { return parseInt(localStorage.getItem('ob_snake_best') || '0', 10) || 0; } catch { return 0; } }
+function snakeSaveBest(v) { try { localStorage.setItem('ob_snake_best', String(v)); } catch {} }
+function snakeShowBest() {
+  document.getElementById('snakeBest').textContent = SNK.best;
+  document.getElementById('snakeBestCard').textContent = SNK.best;
+}
+
+function openSnake() {
+  const pending = gamePendingTasks();
+  if (pending.length) {
+    showToast(`🔒 ทำให้ครบอีก ${pending.length} รายการก่อนนะ`);
+    const card = document.getElementById('card_' + pending[0].id);   // พาไปยังรายการที่ยังไม่ทำ
+    if (card) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      card.classList.remove('pulse'); void card.offsetWidth; card.classList.add('pulse');
+    }
+    return;
+  }
+  document.getElementById('snakePanel').classList.add('show');
+  document.body.style.overflow = 'hidden';
+  snakeResize();
+  if (!SNK.running) snakeDraw();
+}
+function closeSnake() {
+  snakePause();
+  document.getElementById('snakePanel').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+function snakeResize() {
+  const c = document.getElementById('snakeCanvas');
+  const px = Math.round(c.clientWidth * Math.min(window.devicePixelRatio || 1, 2));
+  if (px && c.width !== px) { c.width = c.height = px; }
+  snakeDraw();
+}
+
+function snakePlaceFood() {
+  let f;
+  do { f = { x: Math.floor(Math.random()*SNK.N), y: Math.floor(Math.random()*SNK.N) }; }
+  while (SNK.snake.some(s => s.x === f.x && s.y === f.y));
+  SNK.food = f;
+}
+
+function startSnake() {
+  const m = Math.floor(SNK.N / 2);
+  SNK.snake = [{x:m,y:m},{x:m-1,y:m},{x:m-2,y:m}];
+  SNK.dir = {x:1,y:0}; SNK.next = []; SNK.score = 0; SNK.speed = 160;
+  document.getElementById('snakeScore').textContent = 0;
+  snakePlaceFood();
+  document.getElementById('snakeMsg').style.display = 'none';
+  SNK.running = true;
+  snakeSchedule();
+}
+
+function snakeSchedule() {
+  clearTimeout(SNK.timer);
+  if (SNK.running) SNK.timer = setTimeout(() => { snakeStep(); snakeSchedule(); }, SNK.speed);
+}
+
+function snakePause() {
+  if (!SNK.running) return;
+  SNK.running = false; clearTimeout(SNK.timer);
+  snakeMsg('หยุดชั่วคราว', `คะแนนตอนนี้ ${SNK.score}`, '▶ เล่นต่อ', () => {
+    document.getElementById('snakeMsg').style.display = 'none';
+    SNK.running = true; snakeSchedule();
+  });
+}
+
+function snakeMsg(title, text, btn, fn) {
+  document.getElementById('snakeMsgTitle').textContent = title;
+  document.getElementById('snakeMsgText').innerHTML = text;
+  const b = document.getElementById('snakeStartBtn');
+  b.textContent = btn; b.onclick = fn;
+  document.getElementById('snakeMsg').style.display = 'flex';
+}
+
+// รับคำสั่งเลี้ยว (คิวไว้ 2 คำสั่ง กันกดเร็วแล้วกลับหัวชนตัวเอง)
+function snakeTurn(x, y) {
+  if (!SNK.running) return;
+  const last = SNK.next.length ? SNK.next[SNK.next.length-1] : SNK.dir;
+  if (last.x === -x && last.y === -y) return;
+  if (last.x === x && last.y === y) return;
+  if (SNK.next.length < 2) SNK.next.push({x, y});
+}
+
+function snakeStep() {
+  if (SNK.next.length) SNK.dir = SNK.next.shift();
+  const head = { x: SNK.snake[0].x + SNK.dir.x, y: SNK.snake[0].y + SNK.dir.y };
+  const ate = head.x === SNK.food.x && head.y === SNK.food.y;
+  const body = ate ? SNK.snake : SNK.snake.slice(0, -1);
+  if (head.x < 0 || head.y < 0 || head.x >= SNK.N || head.y >= SNK.N ||
+      body.some(s => s.x === head.x && s.y === head.y)) {
+    return snakeOver();
+  }
+  SNK.snake.unshift(head);
+  if (ate) {
+    SNK.score++;
+    document.getElementById('snakeScore').textContent = SNK.score;
+    SNK.speed = Math.max(70, 160 - SNK.score * 4);   // ยิ่งกินยิ่งเร็ว
+    if (navigator.vibrate) try { navigator.vibrate(15); } catch {}
+    snakePlaceFood();
+  } else {
+    SNK.snake.pop();
+  }
+  snakeDraw();
+}
+
+function snakeOver() {
+  SNK.running = false; clearTimeout(SNK.timer);
+  const isRecord = SNK.score > SNK.best;
+  if (isRecord) { SNK.best = SNK.score; snakeSaveBest(SNK.best); snakeShowBest(); }
+  if (navigator.vibrate) try { navigator.vibrate([60, 40, 60]); } catch {}
+  snakeDraw(true);
+  snakeMsg(isRecord ? '🏆 สถิติใหม่!' : 'จบเกม', `ได้ ${SNK.score} กล่องข้าว 🍱`, '↻ เล่นอีกครั้ง', startSnake);
+}
+
+function snakeDraw(dead) {
+  const c = document.getElementById('snakeCanvas');
+  if (!c.width) return;
+  const g = c.getContext('2d'), W = c.width, cs = W / SNK.N;
+  // พื้นตาราง
+  for (let y = 0; y < SNK.N; y++) for (let x = 0; x < SNK.N; x++) {
+    g.fillStyle = (x + y) % 2 ? '#16324A' : '#1A3A55';
+    g.fillRect(x*cs, y*cs, cs, cs);
+  }
+  // อาหาร
+  if (SNK.food) {
+    g.font = `${cs*0.9}px sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText('🍱', SNK.food.x*cs + cs/2, SNK.food.y*cs + cs/2 + cs*0.05);
+  }
+  // งู
+  SNK.snake.forEach((s, i) => {
+    const pad = i === 0 ? cs*0.04 : cs*0.1;
+    g.fillStyle = dead ? '#E74C3C' : i === 0 ? '#F4B942' : (i % 2 ? '#27AE60' : '#2ECC71');
+    const r = cs*0.3, x = s.x*cs + pad, y = s.y*cs + pad, w = cs - pad*2;
+    g.beginPath();
+    if (g.roundRect) g.roundRect(x, y, w, w, r); else g.rect(x, y, w, w);
+    g.fill();
+  });
+  // ตา
+  if (SNK.snake.length) {
+    const h = SNK.snake[0], cx = h.x*cs + cs/2, cy = h.y*cs + cs/2;
+    const ox = SNK.dir.y !== 0 ? cs*0.2 : 0, oy = SNK.dir.x !== 0 ? cs*0.2 : 0;
+    const fx = SNK.dir.x*cs*0.15, fy = SNK.dir.y*cs*0.15;
+    g.fillStyle = '#0D1B2A';
+    [[1],[-1]].forEach(([k]) => {
+      g.beginPath(); g.arc(cx + fx + ox*k, cy + fy + oy*k, cs*0.09, 0, Math.PI*2); g.fill();
+    });
+  }
+}
+
+// ปัดนิ้วบนกระดาน
+(function snakeInput() {
+  const board = document.getElementById('snakeBoard');
+  let sx = null, sy = null;
+  board.addEventListener('touchstart', e => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
+  board.addEventListener('touchmove', e => {
+    if (sx === null) return;
+    const dx = e.touches[0].clientX - sx, dy = e.touches[0].clientY - sy;
+    if (Math.max(Math.abs(dx), Math.abs(dy)) < 24) return;
+    if (Math.abs(dx) > Math.abs(dy)) snakeTurn(dx > 0 ? 1 : -1, 0); else snakeTurn(0, dy > 0 ? 1 : -1);
+    sx = e.touches[0].clientX; sy = e.touches[0].clientY;   // ปัดต่อเนื่องได้
+  }, { passive: true });
+  board.addEventListener('touchend', () => { sx = sy = null; });
+  document.addEventListener('keydown', e => {
+    if (!document.getElementById('snakePanel').classList.contains('show')) return;
+    const k = { ArrowUp:[0,-1], ArrowDown:[0,1], ArrowLeft:[-1,0], ArrowRight:[1,0], w:[0,-1], s:[0,1], a:[-1,0], d:[1,0] }[e.key];
+    if (k) { e.preventDefault(); snakeTurn(k[0], k[1]); }
+    if (e.key === 'Escape') closeSnake();
+  });
+  window.addEventListener('resize', () => { if (document.getElementById('snakePanel').classList.contains('show')) snakeResize(); });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) snakePause(); });
+})();
+
+SNK.best = snakeLoadBest();
+snakeShowBest();
+document.getElementById('appVer').textContent = APP_VERSION;
+
 initData();
 </script>
 
