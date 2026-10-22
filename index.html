@@ -659,17 +659,59 @@
   .snake-pad .down { grid-column: 2; grid-row: 2; }
   .snake-pad .right { grid-column: 3; grid-row: 2; }
   .app-ver { font-size: 11px; opacity: .6; }
-  .who-chip {
-    display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; max-width: 100%;
-    background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); color: white;
-    border-radius: 99px; padding: 5px 12px; font-family: 'Sarabun', sans-serif; font-size: 12px; cursor: pointer;
+
+  /* ─── WELCOME ANIMATION ─── */
+  .welcome {
+    position: fixed; inset: 0; z-index: 500; display: none; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center; color: white;
+    padding: 24px 16px calc(24px + env(safe-area-inset-bottom)); overflow-y: auto;
+    background: radial-gradient(120% 80% at 50% 0%, #1B6CA8 0%, #0D1B2A 62%);
   }
-  .who-chip b { color: var(--gold); }
-  .who-chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .modal label.fld { display: block; font-size: 12px; font-weight: 600; color: var(--gray); margin-bottom: 4px; }
-  .prefill-badge { display: inline-block; background: #E3F2FD; color: var(--teal); font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 99px; margin-left: 4px; }
-  .link-hint { font-size: 11px; color: var(--gray); line-height: 1.6; background: var(--off-white); border-radius: 8px; padding: 8px 10px; }
-  .link-hint code { background: white; padding: 1px 5px; border-radius: 4px; color: var(--teal); font-weight: 700; }
+  .welcome.show { display: flex; }
+  .welcome.leaving { animation: wFade .45s ease forwards; }
+  @keyframes wFade { to { opacity: 0; transform: scale(1.04); } }
+  .w-skip {
+    position: absolute; top: 14px; right: 14px; background: rgba(255,255,255,.12); border: none;
+    color: white; border-radius: 99px; padding: 7px 14px; font-family: 'Sarabun', sans-serif; font-size: 12px; cursor: pointer;
+  }
+  .w-hand { font-size: 64px; display: inline-block; transform-origin: 70% 80%;
+    animation: wPop .6s cubic-bezier(.3,1.6,.5,1) both, wWave 1.2s ease-in-out .6s 2; }
+  @keyframes wWave { 0%,100%{transform:rotate(0)} 20%,60%{transform:rotate(18deg)} 40%,80%{transform:rotate(-10deg)} }
+  .w-hello { font-family: 'Prompt', sans-serif; font-size: 46px; font-weight: 700; line-height: 1.15; margin-top: 4px; }
+  .w-hello span { display: inline-block; opacity: 0; animation: wRise .5s cubic-bezier(.3,1.4,.5,1) forwards; }
+  .w-sub { font-family: 'Prompt', sans-serif; font-size: 19px; color: var(--gold); margin-top: 6px; opacity: 0; animation: wRise .6s ease 1.1s forwards; }
+  .w-lead { font-size: 14px; opacity: 0; margin: 22px 0 12px; animation: wRise .5s ease 1.7s forwards; }
+  .w-lead b { color: var(--gold); }
+  @keyframes wRise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+  @keyframes wPop  { from { opacity: 0; transform: scale(.3); } to { opacity: 1; transform: scale(1); } }
+  .w-list { width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 10px; }
+  .w-item {
+    display: flex; align-items: center; gap: 12px; text-align: left; padding: 12px 14px;
+    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); border-radius: 14px;
+    opacity: 0; animation: wRise .5s cubic-bezier(.3,1.3,.5,1) forwards; cursor: pointer; color: white;
+    font-family: 'Sarabun', sans-serif; width: 100%;
+  }
+  .w-item.done { border-color: rgba(39,174,96,.7); background: rgba(39,174,96,.16); }
+  .w-num {
+    width: 34px; height: 34px; border-radius: 50%; background: var(--gold); color: var(--navy); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-family: 'Prompt', sans-serif; font-weight: 700; font-size: 16px;
+  }
+  .w-item.done .w-num { background: var(--success); color: white; }
+  .w-t { font-family: 'Prompt', sans-serif; font-size: 14px; font-weight: 600; line-height: 1.3; }
+  .w-warn { font-size: 12px; color: #FFB4A8; margin-top: 3px; }
+  .w-item.done .w-warn { color: #A8E6C1; }
+  .w-go {
+    margin-top: 20px; width: 100%; max-width: 420px; padding: 15px; border: none; border-radius: 14px; cursor: pointer;
+    background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: var(--navy);
+    font-family: 'Prompt', sans-serif; font-size: 17px; font-weight: 700; opacity: 0; animation: wRise .5s ease forwards;
+  }
+  .w-skip:disabled, .w-go:disabled { cursor: not-allowed; }
+  .w-skip:disabled { opacity: .45; }
+  .w-go:disabled { filter: grayscale(.6) brightness(.85); }
+  .imp-badge { display: inline-block; background: #FDECEA; color: var(--danger); font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 99px; margin-right: 6px; margin-top: 5px; }
+  @media (prefers-reduced-motion: reduce) {
+    .welcome *, .welcome { animation-duration: .01s !important; animation-delay: 0s !important; }
+  }
   .game-card.locked { background: linear-gradient(135deg, #5B6B7D 0%, #3E4C5B 100%); }
   .game-card.locked .gc-best { opacity: .45; }
   .gc-lockbar { height: 5px; background: rgba(255,255,255,.18); border-radius: 99px; margin-top: 7px; overflow: hidden; }
@@ -784,7 +826,6 @@
       Admin
     </button>
   </div>
-  <button class="who-chip" id="whoChip" onclick="openProfile(true)" style="display:none">👤 <span id="whoText"></span> · <b>เปลี่ยน</b></button>
   <div class="progress-bar-wrap">
     <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
   </div>
@@ -940,7 +981,6 @@
       <div class="form-row">
         <label>ลิงก์ / Link URL</label>
         <input type="url" id="newLink" placeholder="https://docs.google.com/forms/...">
-        <div class="link-hint">💡 <b>เติมข้อมูลอัตโนมัติ:</b> ใน Google Form กด ⋮ → <b>รับลิงก์ที่กรอกไว้ล่วงหน้า</b> → พิมพ์ <code>{EMP_ID}</code> ในช่องรหัสพนักงาน และ <code>{NAME}</code> ในช่องชื่อ → กดรับลิงก์ แล้วนำมาวางที่นี่</div>
       </div>
       <button class="add-btn" onclick="addTask()">+ เพิ่มรายการ</button>
     </div>
@@ -954,21 +994,15 @@
   </div>
 </div>
 
-<!-- ─── PROFILE MODAL (กรอกครั้งแรกครั้งเดียว) ─── -->
-<div class="overlay" id="profileOverlay">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <h3>👋 กรอกข้อมูลก่อนเริ่ม</h3>
-    <p>กรอกครั้งเดียว ระบบจะใส่ให้อัตโนมัติในทุกแบบฟอร์ม ไม่ต้องพิมพ์ซ้ำ</p>
-    <label class="fld" for="pfEmp">รหัสพนักงาน / Employee ID</label>
-    <input type="text" id="pfEmp" placeholder="เช่น 123456" autocomplete="off" autocapitalize="characters">
-    <label class="fld" for="pfName">ชื่อ-นามสกุล / Full name</label>
-    <input type="text" id="pfName" placeholder="เช่น สมชาย ใจดี" autocomplete="off" onkeydown="if(event.key==='Enter')saveProfile()">
-    <div class="error-msg" id="pfError">⚠️ กรุณากรอกให้ครบทั้ง 2 ช่อง</div>
-    <button class="modal-btn" onclick="saveProfile()">✅ บันทึกและเริ่มเลย</button>
-    <button class="modal-cancel" id="pfSwitch" onclick="switchPerson()" style="display:none;color:var(--danger)">🔁 เปลี่ยนเป็นพนักงานคนอื่น (ล้างความคืบหน้า)</button>
-    <button class="modal-cancel" id="pfCancel" onclick="closeModal('profileOverlay')" style="display:none">ยกเลิก</button>
-  </div>
+<!-- ─── WELCOME ANIMATION ─── -->
+<div class="welcome" id="welcome" aria-live="polite">
+  <button class="w-skip" id="wSkip" onclick="closeWelcome()">ข้าม ›</button>
+  <div class="w-hand">👋</div>
+  <div class="w-hello" id="wHello"></div>
+  <div class="w-sub">ยินดีต้อนรับพนักงานใหม่</div>
+  <div class="w-lead">ก่อนเริ่มงาน มี <b>3 อย่างที่สำคัญมาก</b> ต้องทำให้เสร็จ</div>
+  <div class="w-list" id="wList"></div>
+  <button class="w-go" id="wGo" onclick="closeWelcome()">เริ่มเลย →</button>
 </div>
 
 <!-- ─── RESET CONFIRM MODAL ─── -->
@@ -1015,7 +1049,9 @@
 <script>
 // ═══════════════════════════════════════════════════════════════════════════
 // 📌 VERSION HISTORY
-//   v2.1  (2026-10-19) กรอกรหัสพนักงาน+ชื่อครั้งเดียว → เติมใน Google Form อัตโนมัติ ({EMP_ID} / {NAME})
+//   v2.3  (2026-10-21) ปุ่ม ข้าม / เริ่มเลย กดได้หลัง 5 วินาที
+//   v2.2  (2026-10-21) เอาหน้ากรอกรหัส/ชื่อ (v2.1) ออก · เพิ่มแอนิเมชันต้อนรับ + 3 รายการสำคัญ
+//   v2.1  (2026-10-19) [ถอดออกใน v2.2] กรอกรหัสพนักงาน+ชื่อ → prefill Google Form
 //   v2.0  (2026-10-17) ล็อกเกมงูจนกว่าจะทำรายการครบ (ยกเว้นหมวดสั่งข้าว)
 //   v1.9  (2026-10-17) เพิ่มเกมงู "เกมฆ่าเวลาช่วงรอ" (ไม่นับใน progress)
 //   v1.8  (2026-10-16) ฉาก 3D low-poly ขั้นตอน 1-2-3 (ลงทะเบียนพนักงาน / อื่นๆ)
@@ -1027,7 +1063,7 @@
 //   v1.1  เปลี่ยนรหัส Admin
 //   v1.0  เวอร์ชันแรก
 // ═══════════════════════════════════════════════════════════════════════════
-const APP_VERSION = 'v2.1';
+const APP_VERSION = 'v2.3';
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
 const ADMIN_PW = '212224236';
 
@@ -1063,9 +1099,9 @@ const DEFAULT_CATEGORIES = [
 ];
 const DEFAULT_TASKS = [
   { id: 't1', cat: 'สั่งข้าว',         title: 'สั่งข้าว', sub: 'กดเพื่อสั่งอาหาร', icon: '🍱', link: 'https://docs.google.com/forms/d/e/1FAIpQLSfYBJCmNFar0rgnIlIXm4PHsJelaSmeAbIJNlAKbPlf9i5RAA/viewform' },
-  { id: 't2', cat: 'ลงทะเบียนพนักงาน', title: 'แบบฟอร์มรับทราบเอกสารทรัพย์สินทางปัญญา, BCG และ AUP', sub: 'ฉบับภาษาไทย', icon: '📜', link: 'https://docs.google.com/forms/d/e/1FAIpQLSeTeGqe-3WYpUzqC6XA4yr6dOkWnIr1-P8q-7ByuW5OppjoSQ/viewform' },
-  { id: 't3', cat: 'ลงทะเบียนพนักงาน', title: 'ลงทะเบียนข้อมูลพนักงานสำหรับ Payroll', sub: 'กรอกข้อมูลเงินเดือน', icon: '💰', link: 'https://docs.google.com/forms/d/15ywNo8tdH4Mapen1kCx-q9JuTxJfWZxSNNRYvXbX_0E/viewform?edit_requested=true' },
-  { id: 't4', cat: 'ลงทะเบียนพนักงาน', title: 'ขอความยินยอมข้อมูลชีวมิติ (Biometric)', sub: 'Biometric Data Consent', icon: '🖐️', link: 'https://docs.google.com/forms/d/1CKRznKS-9DPrg6kdoydLdQcgQOWWICEeQztxGXAuV3o/viewform?edit_requested=true' },
+  { id: 't2', cat: 'ลงทะเบียนพนักงาน', title: 'แบบฟอร์มรับทราบเอกสารทรัพย์สินทางปัญญา, BCG และ AUP', sub: 'ฉบับภาษาไทย', icon: '📜', link: 'https://docs.google.com/forms/d/e/1FAIpQLSeTeGqe-3WYpUzqC6XA4yr6dOkWnIr1-P8q-7ByuW5OppjoSQ/viewform', important: true, warn: 'ยังไม่ถือว่ารับทราบกฎบริษัท อาจยังเริ่มงานไม่ได้' },
+  { id: 't3', cat: 'ลงทะเบียนพนักงาน', title: 'ลงทะเบียนข้อมูลพนักงานสำหรับ Payroll', sub: 'กรอกข้อมูลเงินเดือน', icon: '💰', link: 'https://docs.google.com/forms/d/15ywNo8tdH4Mapen1kCx-q9JuTxJfWZxSNNRYvXbX_0E/viewform?edit_requested=true', important: true, warn: 'HR ไม่มีข้อมูลบัญชี เงินเดือนอาจไม่เข้า' },
+  { id: 't4', cat: 'ลงทะเบียนพนักงาน', title: 'ขอความยินยอมข้อมูลชีวมิติ (Biometric)', sub: 'Biometric Data Consent', icon: '🖐️', link: 'https://docs.google.com/forms/d/1CKRznKS-9DPrg6kdoydLdQcgQOWWICEeQztxGXAuV3o/viewform?edit_requested=true', important: true, warn: 'สแกนเข้างานไม่ได้ ไม่มีบันทึกเวลาทำงาน' },
   { id: 't5', cat: 'อื่นๆ',             title: 'ลงทะเบียนรองเท้า & เสื้อ', sub: 'แจ้งไซส์ชุดพนักงาน', icon: '👟', link: 'https://docs.google.com/forms/d/e/1FAIpQLSdMdTziUm7BLCn2RFit9Hh0pqfxvFAP_4Se1CS41VQ_65NnXw/viewform' },
 ];
 const COLOR_CLASSES = ['navy','teal','gold','green'];
@@ -1154,8 +1190,7 @@ async function initData() {
   }
 
   render();
-  updateWhoChip();
-  if (!profile) openProfile(false);   // เปิดครั้งแรก → ขอรหัสพนักงาน + ชื่อ
+  showWelcome();   // แอนิเมชันต้อนรับ + 3 รายการสำคัญ
 
   // 3) โพลไฟล์ version.json ทุก 30 วินาที เผื่อ admin อัปเดตระหว่างเปิดหน้า
   setInterval(pollForUpdates, 30000);
@@ -1497,7 +1532,7 @@ function render() {
       const card = document.createElement('a');
       card.className = 'task-card' + (isDone ? ' completed' : '');
       card.id = 'card_' + task.id;
-      card.href   = buildLink(task.link);
+      card.href   = task.link || '#';
       card.target = '_blank';
       card.rel    = 'noopener noreferrer';
       card.onclick = (e) => handleTaskClick(e, task.id, task.link);
@@ -1508,7 +1543,7 @@ function render() {
           <div class="task-info">
             <div class="task-title">${task.title}</div>
             ${task.sub ? `<div class="task-sub">${task.sub}</div>` : ''}
-            ${useSteps ? `<span class="step-no">STEP ${stepIdx + 1}</span>` : ''}<div class="task-badge ${isDone ? 'done' : ''}">${isDone ? '✓ เสร็จแล้ว' : 'กดเพื่อดำเนินการ'}</div>
+            ${task.important && !isDone ? `<span class="imp-badge">⚠️ สำคัญ</span>` : ''}${useSteps ? `<span class="step-no">STEP ${stepIdx + 1}</span>` : ''}<div class="task-badge ${isDone ? 'done' : ''}">${isDone ? '✓ เสร็จแล้ว' : 'กดเพื่อดำเนินการ'}</div>
           </div>
           ${isDone ? `<div class="task-check">✓</div>` : `<div class="task-arrow">›</div>`}
         </div>`;
@@ -1523,13 +1558,6 @@ function render() {
 }
 
 function handleTaskClick(e, taskId, link) {
-  // ยังไม่ได้กรอกรหัสพนักงาน → ให้กรอกก่อน แล้วเปิดฟอร์มให้ทันทีหลังบันทึก
-  if (hasPrefill(link) && !profile) {
-    e.preventDefault();
-    pendingTask = { taskId, link };
-    openProfile(false);
-    return;
-  }
   clicks[taskId] = (clicks[taskId] || 0) + 1;
   saveLocalClicks(clicks);
   if (!completed.includes(taskId)) {
@@ -1613,7 +1641,7 @@ function renderAdminPanel() {
       <div style="font-size:22px;flex-shrink:0">${task.icon || '📋'}</div>
       <div class="admin-task-info">
         <div class="admin-task-title">${task.title}</div>
-        <div class="admin-task-meta">${task.cat}${hasPrefill(task.link) ? '<span class="prefill-badge">🔗 เติมอัตโนมัติ</span>' : ''} · 👆${clickCount} คลิก · ${isDone ? '✅ เสร็จ' : '⏳ ยังไม่เสร็จ'}</div>
+        <div class="admin-task-meta">${task.cat} · 👆${clickCount} คลิก · ${isDone ? '✅ เสร็จ' : '⏳ ยังไม่เสร็จ'}</div>
       </div>
       <div style="display:flex;gap:6px;flex-shrink:0">
         <button class="edit-btn" onclick="toggleEditForm('${task.id}')">✏️ แก้ไข</button>
@@ -1641,8 +1669,15 @@ function renderAdminPanel() {
           </select>
         </div>
         <div class="edit-form-field">
-          <div class="edit-form-label">ลิงก์ URL · ใส่ {EMP_ID} / {NAME} เพื่อเติมอัตโนมัติ</div>
+          <div class="edit-form-label">ลิงก์ URL</div>
           <input type="url" id="ei_link_${task.id}" value="${task.link || ''}">
+        </div>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--navy)">
+          <input type="checkbox" id="ei_imp_${task.id}" ${task.important ? 'checked' : ''} style="width:18px;height:18px"> ⚠️ รายการสำคัญ (โชว์ในหน้าต้อนรับ)
+        </label>
+        <div class="edit-form-field">
+          <div class="edit-form-label">ถ้าไม่ทำจะเกิดอะไร (สั้นๆ)</div>
+          <input type="text" id="ei_warn_${task.id}" value="${task.warn || ''}" placeholder="เช่น เงินเดือนอาจไม่เข้า">
         </div>
         <div class="edit-form-row">
           <button class="edit-cancel-btn" onclick="toggleEditForm('${task.id}')">ยกเลิก</button>
@@ -1753,6 +1788,8 @@ async function saveEditTask(id) {
     sub:   document.getElementById('ei_sub_'  +id).value.trim(),
     cat:   document.getElementById('ei_cat_'  +id).value,
     link:  document.getElementById('ei_link_' +id).value.trim() || '#',
+    important: document.getElementById('ei_imp_' +id).checked,
+    warn:  document.getElementById('ei_warn_' +id).value.trim(),
   };
   await adminSave();
   renderAdminPanel();
@@ -1832,84 +1869,84 @@ function showToast(msg) {
 document.querySelectorAll('.overlay').forEach(el => {
   el.addEventListener('click', e => {
     if (e.target !== el) return;
-    if (el.id === 'profileOverlay' && !profile) return;   // ต้องกรอกก่อน ปิดไม่ได้
     el.classList.remove('show');
   });
 });
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
-// ─── 👤 EMPLOYEE PROFILE + FORM PREFILL ───────────────────────────────────────
-// ลิงก์ Google Form ที่มีคำแทน {EMP_ID} หรือ {NAME} จะถูกแทนด้วยข้อมูลจริงของพนักงาน
-// (ไม่เติมเลขบัตรประชาชนโดยตั้งใจ — ให้พนักงานพิมพ์เองในฟอร์ม)
-const PREFILL_FIELDS = { EMP_ID: 'emp', NAME: 'name' };
-let profile = loadProfile();
-let pendingTask = null;
+// ─── 👋 WELCOME ANIMATION ─────────────────────────────────────────────────────
+// แสดงทุกครั้งที่เปิดหน้า จนกว่ารายการสำคัญ (important: true) จะทำครบ
+// แก้ข้อความ "ถ้าไม่ทำ" ได้ที่ช่อง warn ใน data/tasks.json หรือในหน้า Admin
+function importantTasks() { return tasks.filter(t => t.important).slice(0, 3); }
 
-function loadProfile() {
-  try { const p = JSON.parse(localStorage.getItem('ob_profile') || 'null'); return p && p.emp ? p : null; }
-  catch { return null; }
+function showWelcome() {
+  const imp = importantTasks();
+  if (!imp.length || imp.every(t => completed.includes(t.id))) return;
+
+  // "สวัสดี" เด้งทีละตัว (แยกตามกลุ่มอักษรไทย ไม่ให้สระ/วรรณยุกต์หลุด)
+  const word = 'สวัสดี';
+  const parts = (window.Intl && Intl.Segmenter)
+    ? [...new Intl.Segmenter('th', { granularity: 'grapheme' }).segment(word)].map(s => s.segment)
+    : ['ส','วั','ส','ดี'];
+  document.getElementById('wHello').innerHTML =
+    parts.map((c, i) => `<span style="animation-delay:${0.35 + i * 0.12}s">${c}</span>`).join('');
+
+  const base = 2.0;
+  document.getElementById('wList').innerHTML = imp.map((t, i) => {
+    const done = completed.includes(t.id);
+    return `<button class="w-item ${done ? 'done' : ''}" style="animation-delay:${base + i * 0.25}s" onclick="welcomeGo('${t.id}')">
+      <div class="w-num">${done ? '✓' : i + 1}</div>
+      <div style="flex:1;min-width:0">
+        <div class="w-t">${t.icon || '📋'} ${t.title}</div>
+        <div class="w-warn">${done ? '✅ ทำแล้ว' : '⚠️ ถ้าไม่ทำ: ' + (t.warn || 'ระบบจะยังไม่สมบูรณ์')}</div>
+      </div>
+    </button>`;
+  }).join('');
+  document.getElementById('wGo').style.animationDelay = (base + imp.length * 0.25 + 0.2) + 's';
+
+  const w = document.getElementById('welcome');
+  w.classList.remove('leaving'); w.classList.add('show');
+  document.body.style.overflow = 'hidden';
+  startWelcomeLock();
 }
-function storeProfile(p) { try { localStorage.setItem('ob_profile', JSON.stringify(p)); } catch {} }
 
-function hasPrefill(link) { return /(\{|%7B)\s*[A-Z_]+\s*(\}|%7D)/i.test(link || ''); }
+// ล็อกปุ่ม "ข้าม" และ "เริ่มเลย" 5 วินาที ให้พนักงานได้อ่าน 3 รายการก่อน
+const WELCOME_LOCK_SEC = 5;
+let welcomeTimer = null;
+function startWelcomeLock() {
+  const skip = document.getElementById('wSkip'), go = document.getElementById('wGo');
+  let left = WELCOME_LOCK_SEC;
+  const paint = () => {
+    const locked = left > 0;
+    skip.disabled = go.disabled = locked;
+    skip.textContent = locked ? `ข้าม (${left})` : 'ข้าม ›';
+    go.textContent   = locked ? `อ่านก่อนนะ… ${left}` : 'เริ่มเลย →';
+  };
+  clearInterval(welcomeTimer);
+  paint();
+  welcomeTimer = setInterval(() => { left--; paint(); if (left <= 0) clearInterval(welcomeTimer); }, 1000);
+}
 
-function buildLink(link) {
-  if (!link || link === '#') return '#';
-  let out = link;
-  Object.entries(PREFILL_FIELDS).forEach(([key, prop]) => {
-    const val = encodeURIComponent(profile ? profile[prop] : '');
-    out = out.replace(new RegExp('(\\{|%7B)\\s*' + key + '\\s*(\\}|%7D)', 'gi'), val);
+function closeWelcome(after) {
+  const w = document.getElementById('welcome');
+  if (!w.classList.contains('show')) return;
+  if (!after && document.getElementById('wGo').disabled) return;   // ยังไม่ครบ 5 วิ
+  w.classList.add('leaving');
+  setTimeout(() => {
+    w.classList.remove('show', 'leaving');
+    document.body.style.overflow = '';
+    if (after) after();
+  }, 430);
+}
+
+// แตะรายการในหน้าต้อนรับ → ปิด แล้วพาไปที่การ์ดนั้น
+function welcomeGo(taskId) {
+  closeWelcome(() => {
+    const card = document.getElementById('card_' + taskId);
+    if (!card) return;
+    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    card.classList.remove('pulse'); void card.offsetWidth; card.classList.add('pulse');
   });
-  // คำแทนอื่นที่ไม่รองรับ (เช่น {ID_CARD}) → ล้างทิ้ง ไม่ให้โชว์ในฟอร์ม
-  return out.replace(/(\{|%7B)\s*[A-Z_]+\s*(\}|%7D)/gi, '');
-}
-
-function updateWhoChip() {
-  const chip = document.getElementById('whoChip');
-  if (!profile) { chip.style.display = 'none'; return; }
-  document.getElementById('whoText').textContent = profile.emp + ' · ' + profile.name;
-  chip.style.display = 'inline-flex';
-}
-
-function openProfile(editing) {
-  document.getElementById('pfEmp').value  = profile ? profile.emp  : '';
-  document.getElementById('pfName').value = profile ? profile.name : '';
-  document.getElementById('pfError').style.display = 'none';
-  document.getElementById('pfCancel').style.display = editing && profile ? 'block' : 'none';
-  document.getElementById('pfSwitch').style.display = editing && profile ? 'block' : 'none';
-  document.getElementById('profileOverlay').classList.add('show');
-  setTimeout(() => document.getElementById('pfEmp').focus(), 300);
-}
-
-function saveProfile() {
-  const emp  = document.getElementById('pfEmp').value.trim().toUpperCase().replace(/\s+/g, '');
-  const name = document.getElementById('pfName').value.trim().replace(/\s+/g, ' ');
-  if (!emp || !name) { document.getElementById('pfError').style.display = 'block'; return; }
-  profile = { emp, name, savedAt: new Date().toISOString() };
-  storeProfile(profile);
-  closeModal('profileOverlay');
-  updateWhoChip();
-  render();
-  showToast('✅ บันทึกแล้ว ' + emp);
-  // ถ้ากดฟอร์มค้างไว้ → เปิดให้เลย (อยู่ใน gesture ของปุ่ม เบราว์เซอร์จึงไม่บล็อก)
-  if (pendingTask) {
-    const { taskId, link } = pendingTask; pendingTask = null;
-    window.open(buildLink(link), '_blank', 'noopener');
-    clicks[taskId] = (clicks[taskId] || 0) + 1; saveLocalClicks(clicks);
-    if (!completed.includes(taskId)) { completed.push(taskId); saveLocalCompleted(completed); }
-    setTimeout(render, 300);
-  }
-}
-
-// เครื่องที่ใช้ร่วมกัน (แท็บเล็ตห้องรอ) → เปลี่ยนคนและล้างความคืบหน้าของคนก่อน
-function switchPerson() {
-  if (!confirm('ล้างข้อมูลและความคืบหน้าของคนปัจจุบัน แล้วให้คนใหม่กรอก?')) return;
-  profile = null;
-  try { localStorage.removeItem('ob_profile'); } catch {}
-  completed = []; clicks = {};
-  saveLocalCompleted([]); saveLocalClicks({});
-  updateWhoChip(); render();
-  openProfile(false);
 }
 
 // ─── 🔒 GAME LOCK ─────────────────────────────────────────────────────────────
